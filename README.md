@@ -40,6 +40,7 @@ Examples:
 class MegaUser < User
   store_attribute :settings, :ratio, :integer, limit: 1
   store_attribute :settings, :login_at, :datetime
+  store_attribute :settings, :active, :boolean
 end
 
 u = MegaUser.new(active: false, login_at: '2015-01-01 00:01', ratio: "63.4608")
@@ -47,6 +48,9 @@ u = MegaUser.new(active: false, login_at: '2015-01-01 00:01', ratio: "63.4608")
 u.login_at.is_a?(DateTime) # => true
 u.login_at = DateTime.new(2015,1,1,11,0,0)
 u.ratio # => 63
+u.active # => false
+# And we also have a predicate method
+u.active? # => false
 u.reload
 
 # After loading record from db store contains casted data
