@@ -96,6 +96,8 @@ module ActiveRecord
       def store_attribute(store_name, name, type, **options)
         _define_accessors_methods(store_name, name)
 
+        _define_predicate_method(name) if type == :boolean
+
         decorate_attribute_type(store_name, "typed_accessor_for_#{name}") do |subtype|
           Type::TypedStore.create_from_type(subtype, name, type, **options)
         end
@@ -121,6 +123,14 @@ module ActiveRecord
             define_method(key) do
               read_store_attribute(store_name, key)
             end
+          end
+        end
+      end
+
+      def _define_predicate_method(name)
+        _store_accessors_module.module_eval do
+          define_method("#{name}?") do
+            send(name) == true
           end
         end
       end

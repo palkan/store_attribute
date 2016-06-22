@@ -13,7 +13,7 @@ module ActiveRecord
     }.freeze
 
     def self.lookup_type(type, options)
-      BASE_TYPES.fetch(type.to_sym).try(:new, options) ||
+      BASE_TYPES[type.to_sym].try(:new, options) ||
         ActiveRecord::Base.connection.type_map.lookup(type.to_s, options)
     end
 
