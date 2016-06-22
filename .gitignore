@@ -1,0 +1,36 @@
+# Numerous always-ignore extensions
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+*.sass-cache
+*.iml
+.idea/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# OS or Editor folders
+.DS_Store
+.cache
+.project
+.settings
+.tmproj
+Thumbs.db
+coverage/
+
+.bundle/
+*.log
+*.gem
+pkg/
+spec/dummy/log/*.log
+spec/dummy/tmp/
+spec/dummy/.sass-cache
+Gemfile.local
+Gemfile.lock

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+gem install bundler --conservative
+bundle check || bundle install
+
+createdb store_attribute_test

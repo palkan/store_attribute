@@ -1,0 +1,18 @@
+language: ruby
+cache: bundler
+
+addons:
+  postgresql: "9.4"
+
+before_script:
+  - createdb store_attribute_test
+  - psql -U postgres -d store_attribute_test -c 'CREATE EXTENSION IF NOT EXISTS hstore;'
+
+matrix:
+  include:
+    - rvm: 2.3.0
+      gemfile: gemfiles/rails-edge.gemfile
+    - rvm: 2.3.0
+      gemfile: gemfiles/rails42.gemfile
+  allow_failures:
+    - gemfile: gemfiles/rails-edge.gemfile
