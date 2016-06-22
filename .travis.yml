@@ -11,8 +11,4 @@ before_script:
 matrix:
   include:
     - rvm: 2.3.0
-      gemfile: gemfiles/rails-edge.gemfile
-    - rvm: 2.3.0
       gemfile: gemfiles/rails42.gemfile
-  allow_failures:
-    - gemfile: gemfiles/rails-edge.gemfile
