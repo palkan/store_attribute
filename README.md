@@ -6,6 +6,8 @@ ActiveRecord extension which adds typecasting to store accessors.
 
 Compatible with **Rails** ~> 4.2.
 
+<a href="https://evilmartians.com/">
+<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
 
 ### Install
 
@@ -20,7 +22,7 @@ gem "store_attribute", "~>0.4.0" # version 0.4.x is for Rails 4.2.x and 0.5.x is
 You can use `store_attribute` method to add additional accessors with a type to an existing store on a model.
 
 ```ruby
-  .store_attribute(store_name, name, type, options = {})
+  store_attribute(store_name, name, type, options = {})
 ```
 
 Where:
@@ -62,7 +64,7 @@ u.settings['ration'] = "3.141592653"
 u.ratio # => "3.141592653"
 
 # On the other hand, writing through accessor set correct data within store
-u.ratio = "3.14.1592653"
+u.ratio = "3.141592653"
 u.ratio # => 3
 u.settings['ratio'] # => 3
 ```
