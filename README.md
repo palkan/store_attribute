@@ -4,7 +4,7 @@
 
 ActiveRecord extension which adds typecasting to store accessors.
 
-Compatible with **Rails** ~> 4.2.
+Compatible with Rails 4.2 and Rails 5.
 
 
 ### Install
@@ -12,7 +12,11 @@ Compatible with **Rails** ~> 4.2.
 In your Gemfile:
 
 ```ruby
-gem "store_attribute", "~>0.4.0" # version 0.4.x is for Rails 4.2.x and 0.5.x is for Rails 5
+# for Rails 5
+gem "store_attribute", "~>0.5.0"
+
+# for Rails 4.2
+gem "store_attribute", "~>0.4.0" 
 ```
 
 ### Usage
