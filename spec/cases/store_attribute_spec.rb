@@ -140,9 +140,32 @@ describe StoreAttribute do
 
     it "typecasts on reload" do
       jamie = User.create!(custom: { price: '$12' })
+      expect(jamie.reload.price).to eq 1200
+
       jamie = User.find(jamie.id)
 
       expect(jamie.price).to eq 1200
+    end
+  end
+
+  context "store subtype" do
+    it "typecasts on build" do
+      user = User.new(inner_json: { x: 1 })
+      expect(user.inner_json).to eq('x' => 1)
+    end
+
+    it "typecasts on update" do
+      user = User.new
+      user.update!(inner_json: { x: 1 })
+      expect(user.inner_json).to eq('x' => 1)
+
+      expect(user.reload.inner_json).to eq('x' => 1)
+    end
+
+    it "typecasts on reload" do
+      jamie = User.create!(inner_json: { x: 1 })
+      jamie = User.find(jamie.id)
+      expect(jamie.inner_json).to eq('x' => 1)
     end
   end
 end

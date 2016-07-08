@@ -39,17 +39,25 @@ module ActiveRecord
 
       def type_cast_from_database(value)
         hash = super
-        type_cast_from_user(hash)
+        if hash
+          accessor_types.each do |key, type|
+            hash[key] = type.type_cast_from_database(hash[key]) if hash.key?(key)
+          end
+        end
+        hash
       end
 
       def type_cast_for_database(value)
-        if value
+        if value.is_a?(Hash)
+          typed_casted = {}
           accessor_types.each do |key, type|
             k = key_to_cast(value, key)
-            value[k] = type.type_cast_for_database(value[k]) unless k.nil?
+            typed_casted[k] = type.type_cast_for_database(value[k]) unless k.nil?
           end
+          super(value.merge(typed_casted))
+        else
+          super(value)
         end
-        super(value)
       end
 
       def type_cast_from_user(value)

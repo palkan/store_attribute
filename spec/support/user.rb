@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
   store_accessor :jparams, :version, active: :boolean, salary: :integer
   store_attribute :jparams, :birthday, :date
 
+  store_attribute :jparams, :inner_json, :json
+
   store :custom, accessors: [price: :money_type]
 
   store_accessor :hdata, visible: :boolean
