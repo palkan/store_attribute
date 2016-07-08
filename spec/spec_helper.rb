@@ -30,4 +30,12 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.mock_with :rspec
+
+  config.filter_run_when_matching :focus
+
+  config.example_status_persistence_file_path = "tmp/rspec_examples.txt"
+
+  if config.files_to_run.one?
+    config.default_formatter = 'doc'
+  end
 end

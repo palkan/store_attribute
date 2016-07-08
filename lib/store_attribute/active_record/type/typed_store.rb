@@ -18,23 +18,31 @@ module ActiveRecord
       end
 
       def add_typed_key(key, type, **options)
-        type = ActiveModel::Type.lookup(type, options) if type.is_a?(Symbol)
+        type = ActiveRecord::Type.lookup(type, options) if type.is_a?(Symbol)
         @accessor_types[key.to_s] = type
       end
 
       def deserialize(value)
         hash = super
-        cast(hash)
+        if hash
+          accessor_types.each do |key, type|
+            hash[key] = type.deserialize(hash[key]) if hash.key?(key)
+          end
+        end
+        hash
       end
 
       def serialize(value)
-        if value
+        if value.is_a?(Hash)
+          typed_casted = {}
           accessor_types.each do |key, type|
             k = key_to_cast(value, key)
-            value[k] = type.serialize(value[k]) unless k.nil?
+            typed_casted[k] = type.serialize(value[k]) unless k.nil?
           end
+          super(value.merge(typed_casted))
+        else
+          super(value)
         end
-        super(value)
       end
 
       def cast(value)

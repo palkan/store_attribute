@@ -9,4 +9,4 @@ class MoneyType < ActiveRecord::Type::Integer
   end
 end
 
-ActiveModel::Type.register(:money_type, MoneyType)
+ActiveRecord::Type.register(:money_type, MoneyType)

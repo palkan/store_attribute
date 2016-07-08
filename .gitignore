@@ -34,3 +34,4 @@ spec/dummy/tmp/
 spec/dummy/.sass-cache
 Gemfile.local
 Gemfile.lock
+tmp/
