@@ -2,14 +2,6 @@ require 'spec_helper'
 
 describe ActiveRecord::Type::TypedStore do
   let(:json_type) { ActiveRecord::Type::Serialized.new(ActiveRecord::Type::Text.new, ActiveRecord::Coders::JSON) }
-  let(:yaml_type) do
-    ActiveRecord::Type::Serialized.new(
-      ActiveRecord::Type::Text.new,
-      ActiveRecord::Store::IndifferentCoder.new(
-        ActiveRecord::Coders::YAMLColumn.new(Hash)
-      )
-    )
-  end
 
   context "with json store" do
     subject { described_class.new(json_type) }
@@ -76,6 +68,27 @@ describe ActiveRecord::Type::TypedStore do
   end
 
   context "with yaml coder" do
+    if RAILS_5_1
+      let(:yaml_type) do
+        ActiveRecord::Type::Serialized.new(
+          ActiveRecord::Type::Text.new,
+          ActiveRecord::Store::IndifferentCoder.new(
+            'test',
+            ActiveRecord::Coders::YAMLColumn.new('test', Hash)
+          )
+        )
+      end
+    else
+      let(:yaml_type) do
+        ActiveRecord::Type::Serialized.new(
+          ActiveRecord::Type::Text.new,
+          ActiveRecord::Store::IndifferentCoder.new(
+            ActiveRecord::Coders::YAMLColumn.new(Hash)
+          )
+        )
+      end
+    end
+
     let(:subject) { described_class.new(yaml_type) }
 
     it "works", :aggregate_failures do

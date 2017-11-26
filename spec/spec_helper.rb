@@ -13,6 +13,8 @@ require 'active_record'
 require 'pg'
 require 'store_attribute'
 
+RAILS_5_1 = ActiveRecord.version.release >= Gem::Version.new("5.1.0")
+
 ActiveRecord::Base.establish_connection(
   adapter: 'postgresql',
   database: 'store_attribute_test'

@@ -4,6 +4,7 @@ require 'store_attribute/active_record/type/typed_store'
 module ActiveRecord
   module Store
     module ClassMethods # :nodoc:
+      alias _orig_store store
       # Defines store on this model.
       #
       # +store_name+ The name of the store.
@@ -21,8 +22,9 @@ module ActiveRecord
       #     store :settings, accessors: [:color, :homepage, login_at: :datetime], coder: JSON
       #   end
       def store(store_name, options = {})
-        serialize store_name, IndifferentCoder.new(options[:coder])
-        store_accessor(store_name, *options[:accessors]) if options.key?(:accessors)
+        accessors = options.delete(:accessors)
+        _orig_store(store_name, options)
+        store_accessor(store_name, *accessors) if accessors
       end
       # Adds additional accessors to an existing store on this model.
       #
