@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split($/)
   s.require_paths = ["lib"]
 
-  s.add_runtime_dependency "activerecord", "~>5.0.0"
+  s.add_runtime_dependency "activerecord", "~>5.0"
 
   s.add_development_dependency "pg", "~>0.18"
   s.add_development_dependency "rake", "~> 10.1"
