@@ -64,7 +64,7 @@ u.settings['login_at'] == DateTime.new(2015,1,1,11,0,0) # => true
 
 # If you update store explicitly then the value returned
 # by accessor isn't type casted
-u.settings['ration'] = "3.141592653"
+u.settings['ratio'] = "3.141592653"
 u.ratio # => "3.141592653"
 
 # On the other hand, writing through accessor set correct data within store
