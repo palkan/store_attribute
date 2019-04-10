@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $:.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
@@ -23,5 +25,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake", "~> 10.1"
   s.add_development_dependency "simplecov", ">= 0.3.8"
   s.add_development_dependency "pry-byebug"
-  s.add_development_dependency "rspec", "~> 3.5.0"
+  s.add_development_dependency "rubocop", "~> 0.65.0"
+  s.add_development_dependency "rubocop-md", "~> 0.2"
+  s.add_development_dependency "standard", "~> 0.0.36"
+  s.add_development_dependency "rspec", ">= 3.5.0"
 end

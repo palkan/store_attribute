@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class RawUser < ActiveRecord::Base
-  self.table_name = 'users'
+  self.table_name = "users"
 end
 
 class User < ActiveRecord::Base
