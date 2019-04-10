@@ -26,14 +26,14 @@ gem "store_attribute", "~> 0.4.0"
 You can use `store_attribute` method to add additional accessors with a type to an existing store on a model.
 
 ```ruby
-store_attribute(store_name, name, type, options = {})
+store_attribute(store_name, name, type, options)
 ```
 
 Where:
 - `store_name` The name of the store.
 - `name` The name of the accessor to the store.
 - `type` A symbol such as `:string` or `:integer`, or a type object to be used for the accessor.
-- `options` A hash of cast type options such as `precision`, `limit`, `scale`.
+- `options` (optional) A hash of cast type options such as `precision`, `limit`, `scale`.
 
 Type casting occurs every time you write data through accessor or update store itself
 and when object is loaded from database.

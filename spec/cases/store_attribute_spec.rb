@@ -66,7 +66,7 @@ describe StoreAttribute do
 
     it "YAML roundtrip" do
       user = User.create!(visible: "0", login_at: time_str)
-      dumped = YAML.safe_load(YAML.dump(user))
+      dumped = YAML.load(YAML.dump(user)) # rubocop:disable Security/YAMLLoad
 
       expect(dumped.visible).to be false
       expect(dumped.login_at).to eq time
