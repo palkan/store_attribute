@@ -4,7 +4,7 @@
 
 ActiveRecord extension which adds typecasting to store accessors.
 
-Compatible with Rails 4.2 and Rails 5.
+Compatible with Rails 4.2 and Rails 5+.
 
 <a href="https://evilmartians.com/">
 <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
@@ -14,11 +14,11 @@ Compatible with Rails 4.2 and Rails 5.
 In your Gemfile:
 
 ```ruby
-# for Rails 5
-gem "store_attribute", "~>0.5.0"
+# for Rails 5+ (6 is supported)
+gem "store_attribute", "~> 0.5.0"
 
 # for Rails 4.2
-gem "store_attribute", "~>0.4.0" 
+gem "store_attribute", "~> 0.4.0"
 ```
 
 ### Usage
@@ -26,7 +26,7 @@ gem "store_attribute", "~>0.4.0"
 You can use `store_attribute` method to add additional accessors with a type to an existing store on a model.
 
 ```ruby
-  store_attribute(store_name, name, type, options = {})
+store_attribute(store_name, name, type, options = {})
 ```
 
 Where:
@@ -49,10 +49,10 @@ class MegaUser < User
   store_attribute :settings, :active, :boolean
 end
 
-u = MegaUser.new(active: false, login_at: '2015-01-01 00:01', ratio: "63.4608")
+u = MegaUser.new(active: false, login_at: "2015-01-01 00:01", ratio: "63.4608")
 
 u.login_at.is_a?(DateTime) # => true
-u.login_at = DateTime.new(2015,1,1,11,0,0)
+u.login_at = DateTime.new(2015, 1, 1, 11, 0, 0)
 u.ratio # => 63
 u.active # => false
 # And we also have a predicate method
@@ -60,17 +60,17 @@ u.active? # => false
 u.reload
 
 # After loading record from db store contains casted data
-u.settings['login_at'] == DateTime.new(2015,1,1,11,0,0) # => true
+u.settings["login_at"] == DateTime.new(2015, 1, 1, 11, 0, 0) # => true
 
 # If you update store explicitly then the value returned
 # by accessor isn't type casted
-u.settings['ratio'] = "3.141592653"
+u.settings["ratio"] = "3.141592653"
 u.ratio # => "3.141592653"
 
 # On the other hand, writing through accessor set correct data within store
 u.ratio = "3.141592653"
 u.ratio # => 3
-u.settings['ratio'] # => 3
+u.settings["ratio"] # => 3
 ```
 
 You can also specify type using usual `store_accessor` method:

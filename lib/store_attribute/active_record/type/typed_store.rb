@@ -1,4 +1,6 @@
-require 'active_record/type'
+# frozen_string_literal: true
+
+require "active_record/type"
 
 module ActiveRecord
   module Type # :nodoc:

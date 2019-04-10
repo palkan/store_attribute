@@ -1,5 +1,7 @@
-require 'active_record/store'
-require 'store_attribute/active_record/type/typed_store'
+# frozen_string_literal: true
+
+require "active_record/store"
+require "store_attribute/active_record/type/typed_store"
 
 module ActiveRecord
   module Store
@@ -26,6 +28,7 @@ module ActiveRecord
         _orig_store(store_name, options)
         store_accessor(store_name, *accessors) if accessors
       end
+
       # Adds additional accessors to an existing store on this model.
       #
       # +store_name+ The name of the store.

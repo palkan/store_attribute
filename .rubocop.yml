@@ -1,51 +1,54 @@
+require:
+  - standard/cop/semantic_blocks
+  - rubocop-md
+
+inherit_gem:
+  standard: config/base.yml
+
 AllCops:
-  # Include gemspec and Rakefile
-  Include:
-    - 'lib/**/*.rb'
-    - 'lib/**/*.rake'
-    - 'spec/**/*.rb'
   Exclude:
-    - 'bin/**/*'
-    - 'spec/dummy/**/*'
+    - 'bin/*'
     - 'tmp/**/*'
+    - 'Gemfile'
+    - 'vendor/**/*'
+    - 'gemfiles/**/*'
     - 'bench/**/*'
   DisplayCopNames: true
-  StyleGuideCopsOnly: false
+  TargetRubyVersion: 2.4
 
-Style/AccessorMethodName:
+Standard/SemanticBlocks:
   Enabled: false
 
-Style/TrivialAccessors:
-  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: true
 
-Style/Documentation:
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: no_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: no_comma
+
+Layout/AlignParameters:
+  EnforcedStyle: with_first_parameter
+
+Lint/Void:
   Exclude:
-    - 'spec/**/*.rb'
+    - '**/*.md'
 
-Style/StringLiterals: 
-  Enabled: false
-
-Style/SpaceInsideStringInterpolation:
-  EnforcedStyle: no_space
-
-Style/BlockDelimiters:
+# See https://github.com/rubocop-hq/rubocop/issues/4222
+Lint/AmbiguousBlockAssociation:
   Exclude:
-    - 'spec/**/*.rb'
+    - 'spec/**/*'
+    - '**/*.md'
 
-Lint/AmbiguousRegexpLiteral:
-  Enabled: false
-
-Metrics/MethodLength:
+Lint/DuplicateMethods:
   Exclude:
-    - 'spec/**/*.rb'
+    - '**/*.md'
 
-Metrics/LineLength:
-  Max: 100
+Naming/FileName:
   Exclude:
-    - 'spec/**/*.rb'
+   - '**/*.md'
 
-Rails/Date:
-  Enabled: false
-
-Rails/TimeZone:
-  Enabled: false
+Layout/InitialIndentation:
+  Exclude:
+    - 'CHANGELOG.md'
