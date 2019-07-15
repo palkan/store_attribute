@@ -6,8 +6,7 @@ ActiveRecord extension which adds typecasting to store accessors.
 
 Compatible with Rails 4.2 and Rails 5+.
 
-<a href="https://evilmartians.com/">
-<img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg" alt="Sponsored by Evil Martians" width="236" height="54"></a>
+Extracted from not merged PR to Rails: [rails/rails#18942](https://github.com/rails/rails/pull/18942).
 
 ### Install
 
