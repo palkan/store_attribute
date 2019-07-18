@@ -130,11 +130,11 @@ describe StoreAttribute do
     it "re-typecast old data" do
       jamie = User.create!
       User.update_all(
-        'jparams = \'{'\
+        "jparams = '{"\
           '"active":"1",'\
           '"salary":"12.02",'\
           '"safe_date":"' + default_date.to_s + '"'\
-        '}\'::jsonb'
+        "}'::jsonb"
       )
 
       jamie = User.find(jamie.id)
