@@ -20,6 +20,30 @@ describe ActiveRecord::Type::TypedStore do
         date = ::Date.new(2016, 6, 22)
         expect(subject.cast(date: "2016-06-22")).to eq("date" => date)
       end
+
+      it "with default" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: date)
+
+        expect(subject.cast({})).to eq("date" => date)
+      end
+
+      it "with default and explicit nil" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: date)
+        nil_date = {"date" => nil}
+
+        expect(subject.cast(nil_date)).to eq(nil_date)
+      end
+
+      it "with default and existing value" do
+        default = ::Date.new(2016, 6, 22)
+        expected = ::Date.new(2019, 7, 17)
+        subject.add_typed_key("date", :date, default: default)
+        date = {"date" => expected}
+
+        expect(subject.cast("date" => expected.to_s)).to eq(date)
+      end
     end
 
     describe "#deserialize" do
@@ -33,6 +57,30 @@ describe ActiveRecord::Type::TypedStore do
 
         date = ::Date.new(2016, 6, 22)
         expect(subject.deserialize('{"date":"2016-06-22"}')).to eq("date" => date)
+      end
+
+      it "with default" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: date)
+
+        expect(subject.deserialize("{}")).to eq("date" => date)
+      end
+
+      it "with default and explicit nil" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: date)
+        s11n = {"date" => nil}.to_json
+
+        expect(subject.deserialize(s11n)).to eq("date" => nil)
+      end
+
+      it "with default and existing value" do
+        default = ::Date.new(2016, 6, 22)
+        expected = ::Date.new(2019, 7, 17)
+        subject.add_typed_key("date", :date, default: default)
+        s11n = {"date" => expected}.to_json
+
+        expect(subject.deserialize(s11n)).to eq("date" => expected)
       end
     end
 
@@ -65,6 +113,13 @@ describe ActiveRecord::Type::TypedStore do
 
         expect(type.cast(date: "2016-06-22", val: "1.2")).to eq("date" => date, "val" => "1.2")
         expect(new_type.cast(date: "2016-06-22", val: "1.2")).to eq("date" => date, "val" => 1)
+      end
+
+      it "accepts default", :aggregate_failures do
+        default = 1
+        type = described_class.create_from_type(json_type, "val", :date, default: default)
+
+        expect(type.cast({})).to eq("val" => default)
       end
     end
   end
@@ -104,6 +159,28 @@ describe ActiveRecord::Type::TypedStore do
       expect(subject.deserialize("---\ndate: 2016-06-22\n")).to eq("date" => date)
       expect(subject.serialize(date: date)).to eq "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2016-06-22\n"
       expect(subject.serialize("date" => date)).to eq "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2016-06-22\n"
+    end
+
+    it "uses default" do
+      default = ::Date.new(2019, 7, 17)
+      subject.add_typed_key("date", :date, default: default)
+
+      expect(subject.deserialize("---\n")).to eq("date" => default)
+    end
+
+    it "keeps explicit nil" do
+      default = ::Date.new(2019, 7, 17)
+      subject.add_typed_key("date", :date, default: default)
+
+      expect(subject.deserialize("---\ndate: null\n")).to eq("date" => nil)
+    end
+
+    it "keeps existing value" do
+      default = ::Date.new(2019, 7, 17)
+      date = ::Date.new(2016, 6, 22)
+      subject.add_typed_key("date", :date, default: default)
+
+      expect(subject.deserialize("---\ndate: #{date}\n")).to eq("date" => date)
     end
   end
 end

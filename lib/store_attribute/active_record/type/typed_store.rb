@@ -15,20 +15,27 @@ module ActiveRecord
 
       def initialize(subtype)
         @accessor_types = {}
+        @defaults = {}
         @store_accessor = subtype.accessor
         super(subtype)
       end
 
-      def add_typed_key(key, type, **options)
+      def add_typed_key(key, type, default: nil, **options)
         type = ActiveRecord::Type.lookup(type, options) if type.is_a?(Symbol)
-        @accessor_types[key.to_s] = type
+        safe_key = key.to_s
+        @accessor_types[safe_key] = type
+        @defaults[safe_key] = default unless default.nil?
       end
 
       def deserialize(value)
         hash = super
         if hash
           accessor_types.each do |key, type|
-            hash[key] = type.deserialize(hash[key]) if hash.key?(key)
+            if hash.key?(key)
+              hash[key] = type.deserialize(hash[key])
+            elsif defaults.key?(key)
+              hash[key] = defaults[key]
+            end
           end
         end
         hash
@@ -37,9 +44,14 @@ module ActiveRecord
       def serialize(value)
         if value.is_a?(Hash)
           typed_casted = {}
-          accessor_types.each do |key, type|
-            k = key_to_cast(value, key)
-            typed_casted[k] = type.serialize(value[k]) unless k.nil?
+          accessor_types.each do |unsafe_key, type|
+            key = key_to_cast(value, unsafe_key)
+            next unless key
+            if value.key?(key)
+              typed_casted[key] = type.serialize(value[key])
+            elsif defaults[key]
+              typed_casted[key] = type.serialize(defaults[key])
+            end
           end
           super(value.merge(typed_casted))
         else
@@ -51,7 +63,11 @@ module ActiveRecord
         hash = super
         if hash
           accessor_types.each do |key, type|
-            hash[key] = type.cast(hash[key]) if hash.key?(key)
+            if hash.key?(key)
+              hash[key] = type.cast(hash[key])
+            elsif defaults.key?(key)
+              hash[key] = defaults[key]
+            end
           end
         end
         hash
@@ -84,7 +100,7 @@ module ActiveRecord
         accessor_types.fetch(key.to_s)
       end
 
-      attr_reader :accessor_types, :store_accessor
+      attr_reader :accessor_types, :defaults, :store_accessor
     end
   end
 end
