@@ -28,6 +28,13 @@ describe ActiveRecord::Type::TypedStore do
         expect(subject.cast({})).to eq("date" => date)
       end
 
+      it "with dynamic default" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: -> { date })
+
+        expect(subject.cast({})).to eq("date" => date)
+      end
+
       it "with default and explicit nil" do
         date = ::Date.new(2016, 6, 22)
         subject.add_typed_key("date", :date, default: date)
@@ -62,6 +69,13 @@ describe ActiveRecord::Type::TypedStore do
       it "with default" do
         date = ::Date.new(2016, 6, 22)
         subject.add_typed_key("date", :date, default: date)
+
+        expect(subject.deserialize("{}")).to eq("date" => date)
+      end
+
+      it "with dynamic default" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: -> { date })
 
         expect(subject.deserialize("{}")).to eq("date" => date)
       end
@@ -118,6 +132,13 @@ describe ActiveRecord::Type::TypedStore do
       it "accepts default", :aggregate_failures do
         default = 1
         type = described_class.create_from_type(json_type, "val", :date, default: default)
+
+        expect(type.cast({})).to eq("val" => default)
+      end
+
+      it "accepts dynamic default", :aggregate_failures do
+        default = 1
+        type = described_class.create_from_type(json_type, "val", :date, default: -> { default })
 
         expect(type.cast({})).to eq("val" => default)
       end
