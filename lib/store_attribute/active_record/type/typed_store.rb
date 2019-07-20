@@ -20,54 +20,52 @@ module ActiveRecord
         super(subtype)
       end
 
-      def add_typed_key(key, type, default: nil, **options)
+      UNDEFINED = Object.new
+      private_constant :UNDEFINED
+
+      def add_typed_key(key, type, default: UNDEFINED, **options)
         type = ActiveRecord::Type.lookup(type, options) if type.is_a?(Symbol)
         safe_key = key.to_s
         @accessor_types[safe_key] = type
-        @defaults[safe_key] = default unless default.nil?
+        @defaults[safe_key] = default unless default == UNDEFINED
       end
 
       def deserialize(value)
         hash = super
-        if hash
-          accessor_types.each do |key, type|
-            if hash.key?(key)
-              hash[key] = type.deserialize(hash[key])
-            elsif defaults.key?(key)
-              hash[key] = defaults[key]
-            end
+        return hash unless hash
+        accessor_types.each do |key, type|
+          if hash.key?(key)
+            hash[key] = type.deserialize(hash[key])
+          elsif has_default?(key)
+            hash[key] = get_default(key)
           end
         end
         hash
       end
 
       def serialize(value)
-        if value.is_a?(Hash)
-          typed_casted = {}
-          accessor_types.each do |unsafe_key, type|
-            key = key_to_cast(value, unsafe_key)
-            next unless key
-            if value.key?(key)
-              typed_casted[key] = type.serialize(value[key])
-            elsif defaults[key]
-              typed_casted[key] = type.serialize(defaults[key])
-            end
+        return super(value) unless value.is_a?(Hash)
+        typed_casted = {}
+        accessor_types.each do |unsafe_key, type|
+          key = key_to_cast(value, unsafe_key)
+          next unless key
+          if value.key?(key)
+            typed_casted[key] = type.serialize(value[key])
+          elsif has_default?(key)
+            typed_casted[key] = type.serialize(get_default(key))
           end
-          super(value.merge(typed_casted))
-        else
-          super(value)
         end
+        super(value.merge(typed_casted))
       end
 
       def cast(value)
         hash = super
-        if hash
-          accessor_types.each do |key, type|
-            if hash.key?(key)
-              hash[key] = type.cast(hash[key])
-            elsif defaults.key?(key)
-              hash[key] = defaults[key]
-            end
+        return hash unless hash
+        accessor_types.each do |key, type|
+          if hash.key?(key)
+            hash[key] = type.cast(hash[key])
+          elsif has_default?(key)
+            hash[key] = get_default(key)
           end
         end
         hash
@@ -98,6 +96,15 @@ module ActiveRecord
 
       def type_for(key)
         accessor_types.fetch(key.to_s)
+      end
+
+      def has_default?(key)
+        defaults.key?(key.to_s)
+      end
+
+      def get_default(key)
+        value = defaults.fetch(key.to_s)
+        value.respond_to?(:call) ? value.call : value
       end
 
       attr_reader :accessor_types, :defaults, :store_accessor

@@ -21,10 +21,11 @@ describe StoreAttribute do
     @connection.drop_table "users", if_exists: true
   end
 
+  let(:date) { Date.new(2019, 7, 17) }
+  let(:default_date) { User::DEFAULT_DATE }
   let(:time) { DateTime.new(2015, 2, 14, 17, 0, 0) }
   let(:time_str) { "2015-02-14 17:00" }
   let(:time_str_utc) { "2015-02-14 17:00:00 UTC" }
-  let(:default_date) { User::DEFAULT_DATE }
 
   context "hstore" do
     it "typecasts on build" do
@@ -32,7 +33,6 @@ describe StoreAttribute do
       expect(user.visible).to eq true
       expect(user).to be_visible
       expect(user.login_at).to eq time
-      expect(user.safe_date).to eq default_date
     end
 
     it "typecasts on reload" do
@@ -43,7 +43,6 @@ describe StoreAttribute do
       expect(user.visible).to eq true
       expect(user).to be_visible
       expect(user.login_at).to eq time
-      expect(user.safe_date).to eq default_date
     end
 
     it "works with accessors" do
@@ -57,7 +56,6 @@ describe StoreAttribute do
       expect(user.visible).to be false
       expect(user).not_to be_visible
       expect(user.login_at).to eq time
-      expect(user.safe_date).to eq default_date
 
       ron = RawUser.find(user.id)
       expect(ron.hdata["visible"]).to eq "false"
@@ -74,7 +72,6 @@ describe StoreAttribute do
 
       expect(dumped.visible).to be false
       expect(dumped.login_at).to eq time
-      expect(dumped.safe_date).to eq default_date
     end
   end
 
@@ -90,7 +87,6 @@ describe StoreAttribute do
       expect(jamie.birthday).to eq Date.new(2000, 1, 1)
       expect(jamie.jparams["birthday"]).to eq Date.new(2000, 1, 1)
       expect(jamie.jparams["active"]).to eq true
-      expect(jamie.jparams["safe_date"]).to eq default_date
     end
 
     it "typecasts on reload" do
@@ -102,7 +98,6 @@ describe StoreAttribute do
       expect(jamie.birthday).to eq Date.new(2000, 1, 1)
       expect(jamie.jparams["birthday"]).to eq Date.new(2000, 1, 1)
       expect(jamie.jparams["active"]).to eq true
-      expect(jamie.jparams["safe_date"]).to eq default_date
     end
 
     it "works with accessors" do
@@ -116,7 +111,6 @@ describe StoreAttribute do
       expect(john).to be_active
       expect(john.birthday).to eq Date.new(2012, 1, 1)
       expect(john.salary).to eq 123
-      expect(john.jparams["safe_date"]).to eq default_date
 
       john.save!
 
@@ -124,7 +118,6 @@ describe StoreAttribute do
       expect(ron.jparams["active"]).to eq true
       expect(ron.jparams["birthday"]).to eq "2012-01-01"
       expect(ron.jparams["salary"]).to eq 123
-      expect(ron.jparams["safe_date"]).to eq default_date.to_s
     end
 
     it "re-typecast old data" do
@@ -132,15 +125,13 @@ describe StoreAttribute do
       User.update_all(
         "jparams = '{"\
           '"active":"1",'\
-          '"salary":"12.02",'\
-          '"safe_date":"' + default_date.to_s + '"'\
+          '"salary":"12.02"'\
         "}'::jsonb"
       )
 
       jamie = User.find(jamie.id)
       expect(jamie).to be_active
       expect(jamie.salary).to eq 12
-      expect(jamie.safe_date).to eq default_date
 
       jamie.save!
 
@@ -184,6 +175,41 @@ describe StoreAttribute do
       jamie = User.create!(inner_json: {x: 1})
       jamie = User.find(jamie.id)
       expect(jamie.inner_json).to eq("x" => 1)
+    end
+  end
+
+  context "default option" do
+    it "should init the field after an object is created" do
+      jamie = User.new
+      expect(jamie.static_date).to eq(default_date)
+    end
+
+    it "should not affect explicit initialization" do
+      jamie = User.new(static_date: date)
+      expect(jamie.static_date).to eq(date)
+    end
+
+    it "should not affect explicit nil initialization" do
+      jamie = User.new(static_date: nil)
+      expect(jamie.static_date).to be_nil
+    end
+
+    it "should handle a static value" do
+      jamie = User.create!
+      jamie = User.find(jamie.id)
+      expect(jamie.static_date).to eq(default_date)
+    end
+
+    it "should handle a lambda" do
+      jamie = User.create!
+      jamie = User.find(jamie.id)
+      expect(jamie.dynamic_date).to eq(default_date)
+    end
+
+    it "should handle nil" do
+      jamie = User.create!
+      jamie = User.find(jamie.id)
+      expect(jamie.empty_date).to be_nil
     end
   end
 end
