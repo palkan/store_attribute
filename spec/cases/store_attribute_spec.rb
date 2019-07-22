@@ -23,6 +23,7 @@ describe StoreAttribute do
 
   let(:date) { Date.new(2019, 7, 17) }
   let(:default_date) { User::DEFAULT_DATE }
+  let(:dynamic_date) { User::TODAY_DATE }
   let(:time) { DateTime.new(2015, 2, 14, 17, 0, 0) }
   let(:time_str) { "2015-02-14 17:00" }
   let(:time_str_utc) { "2015-02-14 17:00:00 UTC" }
@@ -203,7 +204,7 @@ describe StoreAttribute do
     it "should handle a lambda" do
       jamie = User.create!
       jamie = User.find(jamie.id)
-      expect(jamie.dynamic_date).to eq(default_date)
+      expect(jamie.dynamic_date).to eq(dynamic_date)
     end
 
     it "should handle nil" do
