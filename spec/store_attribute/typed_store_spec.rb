@@ -189,6 +189,13 @@ describe ActiveRecord::Type::TypedStore do
       expect(subject.deserialize("---\n")).to eq("date" => default)
     end
 
+    it "uses dynamic default" do
+      default = -> { ::Date.new(2019, 7, 17) }
+      subject.add_typed_key("date", :date, default: default)
+
+      expect(subject.deserialize("---\n")).to eq("date" => default.call)
+    end
+
     it "keeps explicit nil" do
       default = ::Date.new(2019, 7, 17)
       subject.add_typed_key("date", :date, default: default)

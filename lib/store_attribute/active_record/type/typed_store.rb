@@ -36,7 +36,7 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.deserialize(hash[key])
-          elsif has_default?(key)
+          elsif defaults.key?(key)
             hash[key] = get_default(key)
           end
         end
@@ -46,12 +46,12 @@ module ActiveRecord
       def serialize(value)
         return super(value) unless value.is_a?(Hash)
         typed_casted = {}
-        accessor_types.each do |unsafe_key, type|
-          key = key_to_cast(value, unsafe_key)
+        accessor_types.each do |str_key, type|
+          key = key_to_cast(value, str_key)
           next unless key
           if value.key?(key)
             typed_casted[key] = type.serialize(value[key])
-          elsif has_default?(key)
+          elsif defaults.key?(str_key)
             typed_casted[key] = type.serialize(get_default(key))
           end
         end
@@ -64,7 +64,7 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.cast(hash[key])
-          elsif has_default?(key)
+          elsif defaults.key?(key)
             hash[key] = get_default(key)
           end
         end
@@ -98,13 +98,9 @@ module ActiveRecord
         accessor_types.fetch(key.to_s)
       end
 
-      def has_default?(key)
-        defaults.key?(key.to_s)
-      end
-
       def get_default(key)
-        value = defaults.fetch(key.to_s)
-        value.respond_to?(:call) ? value.call : value
+        value = defaults.fetch(key)
+        value.is_a?(Proc) ? value.call : value
       end
 
       attr_reader :accessor_types, :defaults, :store_accessor
