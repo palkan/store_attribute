@@ -52,7 +52,7 @@ module ActiveRecord
           if value.key?(key)
             typed_casted[key] = type.serialize(value[key])
           elsif defaults.key?(str_key)
-            typed_casted[key] = type.serialize(get_default(key))
+            typed_casted[key] = type.serialize(get_default(str_key))
           end
         end
         super(value.merge(typed_casted))
@@ -88,6 +88,7 @@ module ActiveRecord
       def key_to_cast(val, key)
         return key if val.key?(key)
         return key.to_sym if val.key?(key.to_sym)
+        return key if defaults.key?(key)
       end
 
       def typed?(key)
