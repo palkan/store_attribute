@@ -116,6 +116,25 @@ describe ActiveRecord::Type::TypedStore do
 
         expect { subject.serialize(val: 1024) }.to raise_error(RangeError)
       end
+
+      it "with type key and a default" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key("date", :date, default: date)
+        expect(subject.serialize({})).to eq({date: date}.to_json)
+      end
+
+      it "with type key and a dynamic default" do
+        date = ::Date.today
+        default = -> { date }
+        subject.add_typed_key("date", :date, default: default)
+        expect(subject.serialize({})).to eq({date: date}.to_json)
+      end
+
+      it "with a symbolic type key" do
+        date = ::Date.new(2016, 6, 22)
+        subject.add_typed_key(:date, :date, default: date)
+        expect(subject.serialize({})).to eq({date: date}.to_json)
+      end
     end
 
     describe ".create_from_type" do
@@ -209,6 +228,13 @@ describe ActiveRecord::Type::TypedStore do
       subject.add_typed_key("date", :date, default: default)
 
       expect(subject.deserialize("---\ndate: #{date}\n")).to eq("date" => date)
+    end
+
+    it "with a default" do
+      default = ::Date.new(2019, 7, 17)
+      subject.add_typed_key("date", :date, default: default)
+      expected = "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2019-07-17\n"
+      expect(subject.serialize({})).to eq(expected)
     end
   end
 end
