@@ -32,7 +32,7 @@ Where:
 - `store_name` The name of the store.
 - `name` The name of the accessor to the store.
 - `type` A symbol such as `:string` or `:integer`, or a type object to be used for the accessor.
-- `options` (optional) A hash of cast type options such as `precision`, `limit`, `scale`.
+- `options` (optional) A hash of cast type options such as `precision`, `limit`, `scale`, `default`.
 
 Type casting occurs every time you write data through accessor or update store itself
 and when object is loaded from database.
@@ -46,6 +46,7 @@ class MegaUser < User
   store_attribute :settings, :ratio, :integer, limit: 1
   store_attribute :settings, :login_at, :datetime
   store_attribute :settings, :active, :boolean
+  store_attribute :settings, :color, :string, default: "red"
 end
 
 u = MegaUser.new(active: false, login_at: "2015-01-01 00:01", ratio: "63.4608")
@@ -54,6 +55,8 @@ u.login_at.is_a?(DateTime) # => true
 u.login_at = DateTime.new(2015, 1, 1, 11, 0, 0)
 u.ratio # => 63
 u.active # => false
+# Default value is set
+u.color # => red
 # And we also have a predicate method
 u.active? # => false
 u.reload
