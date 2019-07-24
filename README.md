@@ -47,6 +47,7 @@ class MegaUser < User
   store_attribute :settings, :login_at, :datetime
   store_attribute :settings, :active, :boolean
   store_attribute :settings, :color, :string, default: "red"
+  store_attribute :settings, :data, :datetime, default: -> { Time.now }
 end
 
 u = MegaUser.new(active: false, login_at: "2015-01-01 00:01", ratio: "63.4608")
@@ -57,6 +58,8 @@ u.ratio # => 63
 u.active # => false
 # Default value is set
 u.color # => red
+# A dynamic default can also be provided
+u.data # => Current time
 # And we also have a predicate method
 u.active? # => false
 u.reload
