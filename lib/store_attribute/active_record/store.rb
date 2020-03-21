@@ -48,6 +48,9 @@ module ActiveRecord
 
         _define_accessors_methods(store_name, *keys)
 
+        _define_dirty_tracking_methods(store_name, keys)
+        _define_dirty_tracking_methods(store_name, typed_keys.keys)
+
         _prepare_local_stored_attributes(store_name, *keys)
 
         typed_keys.each do |key, type|
@@ -136,6 +139,50 @@ module ActiveRecord
         _store_accessors_module.module_eval do
           define_method("#{name}?") do
             send(name) == true
+          end
+        end
+      end
+
+      def _define_dirty_tracking_methods(store_attribute, keys)
+        _store_accessors_module.module_eval do
+          keys.flatten.each do |key|
+            key = key.to_s
+
+            define_method("#{key}_changed?") do
+              return false unless attribute_changed?(store_attribute)
+              prev_store, new_store = changes[store_attribute]
+              prev_store&.dig(key) != new_store&.dig(key)
+            end
+
+            define_method("#{key}_change") do
+              return unless attribute_changed?(store_attribute)
+              prev_store, new_store = changes[store_attribute]
+              [prev_store&.dig(key), new_store&.dig(key)]
+            end
+
+            define_method("#{key}_was") do
+              return unless attribute_changed?(store_attribute)
+              prev_store, _new_store = changes[store_attribute]
+              prev_store&.dig(key)
+            end
+
+            define_method("saved_change_to_#{key}?") do
+              return false unless saved_change_to_attribute?(store_attribute)
+              prev_store, new_store = saved_change_to_attribute(store_attribute)
+              prev_store&.dig(key) != new_store&.dig(key)
+            end
+
+            define_method("saved_change_to_#{key}") do
+              return unless saved_change_to_attribute?(store_attribute)
+              prev_store, new_store = saved_change_to_attribute(store_attribute)
+              [prev_store&.dig(key), new_store&.dig(key)]
+            end
+
+            define_method("#{key}_before_last_save") do
+              return unless saved_change_to_attribute?(store_attribute)
+              prev_store, _new_store = saved_change_to_attribute(store_attribute)
+              prev_store&.dig(key)
+            end
           end
         end
       end
