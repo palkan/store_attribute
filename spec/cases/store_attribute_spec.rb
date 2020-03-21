@@ -213,4 +213,35 @@ describe StoreAttribute do
       expect(jamie.empty_date).to be_nil
     end
   end
+
+  context "dirty tracking" do
+    let(:user) { User.create! }
+
+    before do
+      user.price = "$ 123"
+      user.visible = false
+    end
+
+    it "should report changes" do
+      expect(user.price_changed?).to be true
+      expect(user.price_change).to eq [ nil, 12300 ]
+      expect(user.price_was).to eq nil
+
+      expect(user.visible_changed?).to be true
+      expect(user.visible_change).to eq [ nil, false ]
+      expect(user.visible_was).to eq nil
+    end
+
+    it "should report saved changes" do
+      user.save!
+
+      expect(user.saved_change_to_price?).to be true
+      expect(user.saved_change_to_price).to eq [ nil, 12300 ]
+      expect(user.price_before_last_save).to eq nil
+
+      expect(user.saved_change_to_visible?).to be true
+      expect(user.saved_change_to_visible).to eq [ nil, false ]
+      expect(user.visible_before_last_save).to eq nil
+    end
+  end
 end
