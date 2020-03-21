@@ -224,11 +224,11 @@ describe StoreAttribute do
 
     it "should report changes" do
       expect(user.price_changed?).to be true
-      expect(user.price_change).to eq [ nil, 12300 ]
+      expect(user.price_change).to eq [nil, 12300]
       expect(user.price_was).to eq nil
 
       expect(user.visible_changed?).to be true
-      expect(user.visible_change).to eq [ nil, false ]
+      expect(user.visible_change).to eq [nil, false]
       expect(user.visible_was).to eq nil
     end
 
@@ -236,11 +236,11 @@ describe StoreAttribute do
       user.save!
 
       expect(user.saved_change_to_price?).to be true
-      expect(user.saved_change_to_price).to eq [ nil, 12300 ]
+      expect(user.saved_change_to_price).to eq [nil, 12300]
       expect(user.price_before_last_save).to eq nil
 
       expect(user.saved_change_to_visible?).to be true
-      expect(user.saved_change_to_visible).to eq [ nil, false ]
+      expect(user.saved_change_to_visible).to eq [nil, false]
       expect(user.visible_before_last_save).to eq nil
     end
   end
