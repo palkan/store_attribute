@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-
-if ENV["COVER"]
-  require "simplecov"
-  SimpleCov.root File.join(File.dirname(__FILE__), "..")
-  SimpleCov.start
+begin
+  require "pry-byebug"
+rescue LoadError
 end
 
-require "rspec"
-require "pry-byebug"
 require "active_record"
 require "pg"
 require "store_attribute"
@@ -19,8 +13,11 @@ RAILS_5_1 = ActiveRecord.version.release >= Gem::Version.new("5.1.0")
 
 ActiveRecord::Base.establish_connection(
   adapter: "postgresql",
-  database: "store_attribute_test"
+  database: "store_attribute_test",
+  host: ENV["DB_HOST"],
+  username: ENV["DB_USER"]
 )
+
 connection = ActiveRecord::Base.connection
 
 unless connection.extension_enabled?("hstore")
@@ -30,7 +27,7 @@ end
 
 connection.reconnect!
 
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.mock_with :rspec

@@ -24,7 +24,7 @@ module ActiveRecord
       private_constant :UNDEFINED
 
       def add_typed_key(key, type, default: UNDEFINED, **options)
-        type = ActiveRecord::Type.lookup(type, options) if type.is_a?(Symbol)
+        type = ActiveRecord::Type.lookup(type, **options) if type.is_a?(Symbol)
         safe_key = key.to_s
         @accessor_types[safe_key] = type
         @defaults[safe_key] = default unless default == UNDEFINED

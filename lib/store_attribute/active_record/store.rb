@@ -25,8 +25,15 @@ module ActiveRecord
       #   end
       def store(store_name, options = {})
         accessors = options.delete(:accessors)
+        typed_accessors =
+          if accessors.last.is_a?(Hash)
+            accessors.pop
+          else
+            {}
+          end
+
         _orig_store(store_name, options)
-        store_accessor(store_name, *accessors) if accessors
+        store_accessor(store_name, *accessors, **typed_accessors) if accessors
       end
 
       # Adds additional accessors to an existing store on this model.

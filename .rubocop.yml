@@ -9,7 +9,6 @@ AllCops:
   Exclude:
     - 'bin/*'
     - 'tmp/**/*'
-    - 'Gemfile'
     - 'vendor/**/*'
     - 'gemfiles/**/*'
     - 'bench/**/*'
@@ -27,9 +26,6 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: no_comma
-
-Layout/AlignParameters:
-  EnforcedStyle: with_first_parameter
 
 Lint/Void:
   Exclude:
