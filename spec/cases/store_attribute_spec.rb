@@ -244,4 +244,18 @@ describe StoreAttribute do
       expect(user.visible_before_last_save).to eq nil
     end
   end
+
+  context "original store implementation" do
+    it "doesn't break original store when no accessors passed" do
+      dummy_class = Class.new(ActiveRecord::Base) do
+        self.table_name = "users"
+
+        store :custom, coder: JSON
+      end
+
+      dummy = dummy_class.new(custom: {key: "text"})
+
+      expect(dummy.custom).to eq({"key" => "text"})
+    end
+  end
 end
