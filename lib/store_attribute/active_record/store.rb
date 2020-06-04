@@ -26,7 +26,7 @@ module ActiveRecord
       def store(store_name, options = {})
         accessors = options.delete(:accessors)
         typed_accessors =
-          if accessors.last.is_a?(Hash)
+          if accessors && accessors.last.is_a?(Hash)
             accessors.pop
           else
             {}
