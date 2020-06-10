@@ -1,3 +1,4 @@
+[![Cult Of Martians](http://cultofmartians.com/assets/badges/badge.svg)](https://cultofmartians.com/tasks/store-attribute-defaults.html#task)
 [![Gem Version](https://badge.fury.io/rb/store_attribute.svg)](https://rubygems.org/gems/store_attribute) [![Build Status](https://travis-ci.org/palkan/store_attribute.svg?branch=master)](https://travis-ci.org/palkan/store_attribute)
 
 ## Store Attribute
