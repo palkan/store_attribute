@@ -15,6 +15,8 @@ class User < ActiveRecord::Base
   store_attribute :jparams, :empty_date, :date, default: nil
   store_attribute :jparams, :inner_json, :json
 
+  store_accessor :jparams, active: :boolean, birthday: :date, prefix: "json", suffix: "value"
+
   store :custom, accessors: [price: :money_type]
 
   store_accessor :hdata, visible: :boolean

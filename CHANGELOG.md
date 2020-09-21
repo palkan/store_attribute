@@ -2,6 +2,8 @@
 
 ## master
 
+- Add support for `prefix` and `suffix` options. ([@palkan][])
+
 ## 0.7.1
 
 - Fixed bug with `store` called without accessors. ([@ioki-klaus][])

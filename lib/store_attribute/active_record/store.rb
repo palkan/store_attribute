@@ -44,24 +44,29 @@ module ActiveRecord
       #
       # +typed_keys+ The key-to-type hash of the accesors with type to the store.
       #
+      # +prefix+ Accessor method name prefix
+      #
+      # +suffix+ Accessor method name suffix
+      #
       # Examples:
       #
       #   class SuperUser < User
       #     store_accessor :settings, :privileges, login_at: :datetime
       #   end
-      def store_accessor(store_name, *keys, **typed_keys)
+      def store_accessor(store_name, *keys, prefix: nil, suffix: nil, **typed_keys)
         keys = keys.flatten
         typed_keys = typed_keys.except(keys)
 
-        _define_accessors_methods(store_name, *keys)
+        accessor_prefix, accessor_suffix = _normalize_prefix_suffix(store_name, prefix, suffix)
 
-        _define_dirty_tracking_methods(store_name, keys)
-        _define_dirty_tracking_methods(store_name, typed_keys.keys)
+        _define_accessors_methods(store_name, *keys, prefix: accessor_prefix, suffix: accessor_suffix)
+
+        _define_dirty_tracking_methods(store_name, keys + typed_keys.keys, prefix: accessor_prefix, suffix: accessor_suffix)
 
         _prepare_local_stored_attributes(store_name, *keys)
 
         typed_keys.each do |key, type|
-          store_attribute(store_name, key, type)
+          store_attribute(store_name, key, type, prefix: prefix, suffix: suffix)
         end
       end
 
@@ -78,6 +83,10 @@ module ActiveRecord
       # +type+ A symbol such as +:string+ or +:integer+, or a type object
       # to be used for the accessor.
       #
+      # +prefix+ Accessor method name prefix
+      #
+      # +suffix+ Accessor method name suffix
+      #
       # +options+ A hash of cast type options such as +precision+, +limit+, +scale+.
       #
       # Examples:
@@ -85,13 +94,16 @@ module ActiveRecord
       #   class MegaUser < User
       #     store_attribute :settings, :ratio, :integer, limit: 1
       #     store_attribute :settings, :login_at, :datetime
+      #
+      #     store_attribute :extra, :version, :integer, prefix: :meta
       #   end
       #
-      #   u = MegaUser.new(active: false, login_at: '2015-01-01 00:01', ratio: "63.4608")
+      #   u = MegaUser.new(active: false, login_at: '2015-01-01 00:01', ratio: "63.4608", meta_version: "1")
       #
       #   u.login_at.is_a?(DateTime) # => true
       #   u.login_at = DateTime.new(2015,1,1,11,0,0)
       #   u.ratio # => 63
+      #   u.meta_version #=> 1
       #   u.reload
       #
       #   # After loading record from db store contains casted data
@@ -108,10 +120,12 @@ module ActiveRecord
       #   u.settings['ratio'] # => 3
       #
       # For more examples on using types, see documentation for ActiveRecord::Attributes.
-      def store_attribute(store_name, name, type, **options)
-        _define_accessors_methods(store_name, name)
+      def store_attribute(store_name, name, type, prefix: nil, suffix: nil, **options)
+        prefix, suffix = _normalize_prefix_suffix(store_name, prefix, suffix)
 
-        _define_predicate_method(name) if type == :boolean
+        _define_accessors_methods(store_name, name, prefix: prefix, suffix: suffix)
+
+        _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
         decorate_attribute_type(store_name, "typed_accessor_for_#{name}") do |subtype|
           Type::TypedStore.create_from_type(subtype, name, type, **options)
@@ -128,70 +142,95 @@ module ActiveRecord
         self.local_stored_attributes[store_name] |= keys
       end
 
-      def _define_accessors_methods(store_name, *keys) # :nodoc:
+      def _define_accessors_methods(store_name, *keys, prefix: nil, suffix: nil) # :nodoc:
         _store_accessors_module.module_eval do
           keys.each do |key|
-            define_method("#{key}=") do |value|
+            accessor_key = "#{prefix}#{key}#{suffix}"
+
+            define_method("#{accessor_key}=") do |value|
               write_store_attribute(store_name, key, value)
             end
 
-            define_method(key) do
+            define_method(accessor_key) do
               read_store_attribute(store_name, key)
             end
           end
         end
       end
 
-      def _define_predicate_method(name)
+      def _define_predicate_method(name, prefix: nil, suffix: nil)
         _store_accessors_module.module_eval do
+          name = "#{prefix}#{name}#{suffix}"
+
           define_method("#{name}?") do
             send(name) == true
           end
         end
       end
 
-      def _define_dirty_tracking_methods(store_attribute, keys)
+      def _define_dirty_tracking_methods(store_attribute, keys, prefix: nil, suffix: nil)
         _store_accessors_module.module_eval do
           keys.flatten.each do |key|
             key = key.to_s
+            accessor_key = "#{prefix}#{key}#{suffix}"
 
-            define_method("#{key}_changed?") do
+            define_method("#{accessor_key}_changed?") do
               return false unless attribute_changed?(store_attribute)
               prev_store, new_store = changes[store_attribute]
               prev_store&.dig(key) != new_store&.dig(key)
             end
 
-            define_method("#{key}_change") do
+            define_method("#{accessor_key}_change") do
               return unless attribute_changed?(store_attribute)
               prev_store, new_store = changes[store_attribute]
               [prev_store&.dig(key), new_store&.dig(key)]
             end
 
-            define_method("#{key}_was") do
+            define_method("#{accessor_key}_was") do
               return unless attribute_changed?(store_attribute)
               prev_store, _new_store = changes[store_attribute]
               prev_store&.dig(key)
             end
 
-            define_method("saved_change_to_#{key}?") do
+            define_method("saved_change_to_#{accessor_key}?") do
               return false unless saved_change_to_attribute?(store_attribute)
               prev_store, new_store = saved_change_to_attribute(store_attribute)
               prev_store&.dig(key) != new_store&.dig(key)
             end
 
-            define_method("saved_change_to_#{key}") do
+            define_method("saved_change_to_#{accessor_key}") do
               return unless saved_change_to_attribute?(store_attribute)
               prev_store, new_store = saved_change_to_attribute(store_attribute)
               [prev_store&.dig(key), new_store&.dig(key)]
             end
 
-            define_method("#{key}_before_last_save") do
+            define_method("#{accessor_key}_before_last_save") do
               return unless saved_change_to_attribute?(store_attribute)
               prev_store, _new_store = saved_change_to_attribute(store_attribute)
               prev_store&.dig(key)
             end
           end
         end
+      end
+
+      def _normalize_prefix_suffix(store_name, prefix, suffix)
+        prefix =
+          case prefix
+          when String, Symbol
+            "#{prefix}_"
+          when TrueClass
+            "#{store_name}_"
+          end
+
+        suffix =
+          case suffix
+          when String, Symbol
+            "_#{suffix}"
+          when TrueClass
+            "_#{store_name}"
+          end
+
+        [prefix, suffix]
       end
     end
   end

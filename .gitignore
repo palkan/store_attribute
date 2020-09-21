@@ -35,3 +35,5 @@ spec/dummy/.sass-cache
 Gemfile.local
 Gemfile.lock
 tmp/
+*.override.yml
+*.local.yml

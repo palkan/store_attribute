@@ -214,6 +214,24 @@ describe StoreAttribute do
     end
   end
 
+  context "prefix/suffix" do
+    it "should accept prefix and suffix options for stores" do
+      jamie = User.create!(json_active_value: "t", json_birthday_value: "2019-06-26")
+      jamie = User.find(jamie.id)
+
+      expect(jamie.json_active_value).to eql(true)
+      expect(jamie.json_birthday_value).to eq(Time.local(2019, 6, 26).to_date)
+
+      jamie.json_active_value = false
+
+      expect(jamie.json_active_value_changed?).to eql(true)
+
+      jamie.save!
+
+      expect(jamie.saved_change_to_json_active_value).to eq([true, false])
+    end
+  end
+
   context "dirty tracking" do
     let(:user) { User.create! }
 

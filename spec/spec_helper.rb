@@ -11,11 +11,21 @@ require "store_attribute"
 
 RAILS_5_1 = ActiveRecord.version.release >= Gem::Version.new("5.1.0")
 
+connection_params =
+  if ENV.key?("DATABASE_URL")
+    {"url" => ENV["DATABASE_URL"]}
+  else
+    {
+      "host" => ENV["DB_HOST"],
+      "username" => ENV["DB_USER"]
+    }
+  end
+
 ActiveRecord::Base.establish_connection(
-  adapter: "postgresql",
-  database: "store_attribute_test",
-  host: ENV["DB_HOST"],
-  username: ENV["DB_USER"]
+  {
+    "adapter" => "postgresql",
+    "database" => "store_attribute_test"
+  }.merge(connection_params)
 )
 
 connection = ActiveRecord::Base.connection
