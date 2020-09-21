@@ -2,6 +2,10 @@
 
 ## master
 
+## 0.8.0
+
+- Add Rails 6.1 compatibility. ([@palkan][])
+
 - Add support for `prefix` and `suffix` options. ([@palkan][])
 
 ## 0.7.1
