@@ -16,6 +16,8 @@ matrix:
       gemfile: gemfiles/rails6.gemfile
     - rvm: 2.7
       gemfile: gemfiles/rails6.gemfile
+    - rvm: 2.7
+      gemfile: gemfiles/railsmaster.gemfile
     - rvm: ruby-head
       gemfile: gemfiles/railsmaster.gemfile
   allow_failures:
