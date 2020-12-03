@@ -2,6 +2,8 @@
 
 ## master
 
+## 0.8.1 (2020-12-03)
+
 - Fix adding dirty tracking methods for `store_attribute`. ([@palkan][])
 
 ## 0.8.0
