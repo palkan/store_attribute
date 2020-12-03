@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix adding dirty tracking methods for `store_attribute`. ([@palkan][])
+
 ## 0.8.0
 
 - Add Rails 6.1 compatibility. ([@palkan][])

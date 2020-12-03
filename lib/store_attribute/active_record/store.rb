@@ -140,6 +140,8 @@ module ActiveRecord
           end
         end
 
+        _define_dirty_tracking_methods(store_name, [name], prefix: prefix, suffix: suffix)
+
         _prepare_local_stored_attributes(store_name, name)
       end
 

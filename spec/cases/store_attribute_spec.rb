@@ -234,10 +234,12 @@ describe StoreAttribute do
 
   context "dirty tracking" do
     let(:user) { User.create! }
+    let(:now) { Time.now }
 
     before do
       user.price = "$ 123"
       user.visible = false
+      user.login_at = now.to_s(:db)
     end
 
     it "should report changes" do
@@ -248,6 +250,11 @@ describe StoreAttribute do
       expect(user.visible_changed?).to be true
       expect(user.visible_change).to eq [nil, false]
       expect(user.visible_was).to eq nil
+
+      expect(user.login_at_changed?).to be true
+      expect(user.login_at_change[0]).to be_nil
+      expect(user.login_at_change[1].to_i).to eq now.to_i
+      expect(user.login_at_was).to eq nil
     end
 
     it "should report saved changes" do
