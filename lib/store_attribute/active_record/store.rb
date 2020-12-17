@@ -128,7 +128,7 @@ module ActiveRecord
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
         # Rails >6.0
-        if method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 1
+        if !respond_to?(:decorate_attribute_type) || method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 1
           attr_name = store_name.to_s
           was_type = attributes_to_define_after_schema_loads[attr_name]&.first
           attribute(attr_name) do |subtype|
