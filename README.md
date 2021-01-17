@@ -16,7 +16,7 @@ In your Gemfile:
 
 ```ruby
 # for Rails 5+ (6 is supported)
-gem "store_attribute", "~> 0.5.0"
+gem "store_attribute", "~> 0.8.0"
 
 # for Rails 4.2
 gem "store_attribute", "~> 0.4.0"
