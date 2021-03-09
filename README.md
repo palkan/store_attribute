@@ -49,6 +49,7 @@ class MegaUser < User
   store_attribute :settings, :login_at, :datetime
   store_attribute :settings, :active, :boolean
   store_attribute :settings, :color, :string, default: "red"
+  store_attribute :settings, :colors, :json, default: ["red", "blue"]
   store_attribute :settings, :data, :datetime, default: -> { Time.now }
 end
 
@@ -60,6 +61,8 @@ u.ratio # => 63
 u.active # => false
 # Default value is set
 u.color # => red
+# Default array is set
+u.colors # => ["red", "blue"]
 # A dynamic default can also be provided
 u.data # => Current time
 # And we also have a predicate method
