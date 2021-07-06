@@ -24,10 +24,9 @@ jobs:
           "gemfiles/rails6.gemfile"
         ]
         include:
-        # TEMP: We need to figure Rails 6.2 compatibility first
-        # - ruby: "2.7"
-        #   postgres: "13"
-        #   gemfile: "gemfiles/railsmaster.gemfile"
+        - ruby: "3.0"
+          postgres: "13"
+          gemfile: "gemfiles/railsmaster.gemfile"
         - ruby: "2.7"
           postgres: "12"
           gemfile: "gemfiles/rails6.gemfile"
