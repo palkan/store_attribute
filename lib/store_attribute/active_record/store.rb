@@ -132,7 +132,11 @@ module ActiveRecord
           attr_name = store_name.to_s
           was_type = attributes_to_define_after_schema_loads[attr_name]&.first
           attribute(attr_name) do |subtype|
-            Type::TypedStore.create_from_type(_lookup_cast_type(attr_name, was_type, {}), name, type, **options)
+            if defined?(_lookup_cast_type)
+              Type::TypedStore.create_from_type(_lookup_cast_type(attr_name, was_type, {}), name, type, **options)
+            else
+              Type::TypedStore.create_from_type(subtype, name, type, **options)
+            end
           end
         else
           decorate_attribute_type(store_name, "typed_accessor_for_#{name}") do |subtype|
