@@ -212,6 +212,12 @@ describe StoreAttribute do
       jamie = User.find(jamie.id)
       expect(jamie.empty_date).to be_nil
     end
+
+    it "should not mark as dirty" do
+      jamie = User.create!
+      jamie.static_date
+      expect(jamie.changes).to eq({})
+    end
   end
 
   context "prefix/suffix" do
@@ -255,6 +261,8 @@ describe StoreAttribute do
       expect(user.login_at_change[0]).to be_nil
       expect(user.login_at_change[1].to_i).to eq now.to_i
       expect(user.login_at_was).to eq nil
+
+      expect(user.changes["hdata"]).to eq ([{}, { "login_at" => now.to_s(:db), "visible" => false }])
     end
 
     it "should report saved changes" do
