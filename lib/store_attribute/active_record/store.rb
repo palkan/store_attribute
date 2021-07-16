@@ -167,7 +167,9 @@ module ActiveRecord
             end
 
             define_method(accessor_key) do
-              read_store_attribute(store_name, key)
+              next_value = read_store_attribute(store_name, key)
+              clear_attribute_change(store_name) unless changed?
+              next_value
             end
           end
         end
