@@ -43,6 +43,10 @@ module ActiveRecord
         hash
       end
 
+      def changed_in_place?(raw_old_value, new_value)
+        raw_old_value != serialize(new_value)
+      end
+
       def serialize(value)
         return super(value) unless value.is_a?(Hash)
         typed_casted = {}
