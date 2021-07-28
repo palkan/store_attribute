@@ -66,8 +66,7 @@ module ActiveRecord
         _store_accessors_module.module_eval do
           define_method("changes") do
             changes = super()
-            local_stored_attributes = self.class.local_stored_attributes
-            local_stored_attributes.each do |accessor, attributes|
+            self.class.local_stored_attributes.each do |accessor, attributes|
               next unless attribute_changed?(accessor)
 
               prev_store, new_store = changes[accessor]
