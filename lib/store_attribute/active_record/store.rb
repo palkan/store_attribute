@@ -61,9 +61,28 @@ module ActiveRecord
 
         _define_accessors_methods(store_name, *keys, prefix: accessor_prefix, suffix: accessor_suffix)
 
-        _define_dirty_tracking_methods(store_name, keys + typed_keys.keys, prefix: accessor_prefix, suffix: accessor_suffix)
-
         _prepare_local_stored_attributes(store_name, *keys)
+
+        _store_accessors_module.module_eval do
+          define_method("changes") do
+            changes = super()
+            local_stored_attributes = self.class.local_stored_attributes
+            local_stored_attributes.each do |accessor, attributes|
+              next unless attribute_changed?(accessor)
+
+              prev_store, new_store = changes[accessor]
+              prev_store.each do |key, value|
+                if new_store[key] == value
+                  changes[accessor][0].except!(key)
+                  changes[accessor][1].except!(key)
+                end
+              end
+            end
+            changes
+          end
+        end
+
+        _define_dirty_tracking_methods(store_name, keys + typed_keys.keys, prefix: accessor_prefix, suffix: accessor_suffix)
 
         typed_keys.each do |key, type|
           store_attribute(store_name, key, type, prefix: prefix, suffix: suffix)
@@ -144,9 +163,9 @@ module ActiveRecord
           end
         end
 
-        _define_dirty_tracking_methods(store_name, [name], prefix: prefix, suffix: suffix)
-
         _prepare_local_stored_attributes(store_name, name)
+
+        _define_dirty_tracking_methods(store_name, [name], prefix: prefix, suffix: suffix)
       end
 
       def _prepare_local_stored_attributes(store_name, *keys) # :nodoc:
@@ -167,9 +186,7 @@ module ActiveRecord
             end
 
             define_method(accessor_key) do
-              next_value = read_store_attribute(store_name, key)
-              clear_attribute_change(store_name) unless changed?
-              next_value
+              read_store_attribute(store_name, key)
             end
           end
         end

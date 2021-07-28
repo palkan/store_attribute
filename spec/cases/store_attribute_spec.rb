@@ -218,6 +218,14 @@ describe StoreAttribute do
       jamie.static_date
       expect(jamie.changes).to eq({})
     end
+
+    it "should only include changed accessors" do
+      jamie = User.create!
+      jamie.static_date
+      jamie.visible = true
+      jamie.active = true
+      expect(jamie.changes).to eq({"hdata"=>[{}, {"visible"=>true}], "jparams"=>[{}, {"active" => true}]})
+    end
   end
 
   context "prefix/suffix" do
@@ -275,6 +283,12 @@ describe StoreAttribute do
       expect(user.saved_change_to_visible?).to be true
       expect(user.saved_change_to_visible).to eq [nil, false]
       expect(user.visible_before_last_save).to eq nil
+    end
+
+    it "should only report on changed accessors" do
+      user.active = true
+      expect(user.changes["jparams"]).to eq([{}, {"active" => true}])
+      expect(user.static_date_changed?).to be false
     end
   end
 
