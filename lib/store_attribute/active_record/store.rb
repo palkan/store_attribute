@@ -65,6 +65,7 @@ module ActiveRecord
 
         _store_accessors_module.module_eval do
           define_method("changes") do
+            return @changes if defined?(@changes)
             changes = super()
             self.class.local_stored_attributes.each do |accessor, attributes|
               next unless attribute_changed?(accessor)
@@ -77,7 +78,7 @@ module ActiveRecord
                 end
               end
             end
-            changes
+            @changes = changes
           end
         end
 
