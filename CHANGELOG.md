@@ -2,6 +2,10 @@
 
 ## master
 
+## 0.9.0 (2021-08-17) 📉
+
+- Default values no longer marked as dirty. ([@markedmondson][])
+
 ## 0.8.1 (2020-12-03)
 
 - Fix adding dirty tracking methods for `store_attribute`. ([@palkan][])
@@ -37,3 +41,4 @@
 [@SumLare]: https://github.com/SumLare
 [@glaszig]: https://github.com/glaszig
 [@ioki-klaus]: https://github.com/ioki-klaus
+[@markedmondson]: https://github.com/markedmondson
