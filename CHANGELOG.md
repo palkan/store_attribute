@@ -2,6 +2,10 @@
 
 ## master
 
+## 0.9.1
+
+- Fix bug with dirty nullable stores. ([@palkan][])
+
 ## 0.9.0 (2021-08-17) 📉
 
 - Default values no longer marked as dirty. ([@markedmondson][])
