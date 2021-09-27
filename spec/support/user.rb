@@ -4,6 +4,12 @@ class RawUser < ActiveRecord::Base
   self.table_name = "users"
 end
 
+class UserWithoutDefaults < ActiveRecord::Base
+  self.table_name = "users"
+
+  store_attribute :extra, :birthday, :date
+end
+
 class User < ActiveRecord::Base
   DEFAULT_DATE = ::Date.new(2019, 7, 17)
   TODAY_DATE = ::Date.today

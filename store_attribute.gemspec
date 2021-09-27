@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = ">= 2.4.0"
+  s.required_ruby_version = ">= 2.5.0"
 
   s.metadata = {
     "bug_tracker_uri" => "http://github.com/palkan/store_attribute/issues",
@@ -30,7 +30,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "pg", ">= 0.18"
   s.add_development_dependency "rake", ">= 13.0"
-  s.add_development_dependency "rubocop-md", "~> 0.3"
-  s.add_development_dependency "standard", "~> 0.2.0"
   s.add_development_dependency "rspec", ">= 3.5.0"
 end

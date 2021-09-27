@@ -8,6 +8,7 @@ describe StoreAttribute do
 
     @connection.transaction do
       @connection.create_table("users") do |t|
+        t.jsonb :extra
         t.jsonb :jparams, default: {}, null: false
         t.text :custom
         t.hstore :hdata, default: {}, null: false
@@ -224,7 +225,7 @@ describe StoreAttribute do
       jamie.static_date
       jamie.visible = true
       jamie.active = true
-      expect(jamie.changes).to eq({"hdata"=>[{}, {"visible"=>true}], "jparams"=>[{}, {"active" => true}]})
+      expect(jamie.changes).to eq({"hdata" => [{}, {"visible" => true}], "jparams" => [{}, {"active" => true}]})
     end
   end
 
@@ -270,7 +271,7 @@ describe StoreAttribute do
       expect(user.login_at_change[1].to_i).to eq now.to_i
       expect(user.login_at_was).to eq nil
 
-      expect(user.changes["hdata"]).to eq ([{}, { "login_at" => now.to_s(:db), "visible" => false }])
+      expect(user.changes["hdata"]).to eq [{}, {"login_at" => now.to_s(:db), "visible" => false}]
     end
 
     it "should report saved changes" do
@@ -289,6 +290,14 @@ describe StoreAttribute do
       user.active = true
       expect(user.changes["jparams"]).to eq([{}, {"active" => true}])
       expect(user.static_date_changed?).to be false
+    end
+
+    # https://github.com/palkan/store_attribute/issues/19
+    it "without defaults" do
+      user = UserWithoutDefaults.new
+      user.birthday = "2019-06-26"
+
+      expect(user.birthday_changed?).to eq true
     end
   end
 
