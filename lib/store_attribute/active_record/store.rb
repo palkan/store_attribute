@@ -6,7 +6,7 @@ require "store_attribute/active_record/type/typed_store"
 module ActiveRecord
   module Store
     module ClassMethods # :nodoc:
-      alias _orig_store store
+      alias_method :_orig_store, :store
       # Defines store on this model.
       #
       # +store_name+ The name of the store.
@@ -62,25 +62,6 @@ module ActiveRecord
         _define_accessors_methods(store_name, *keys, prefix: accessor_prefix, suffix: accessor_suffix)
 
         _prepare_local_stored_attributes(store_name, *keys)
-
-        _store_accessors_module.module_eval do
-          define_method("changes") do
-            return @changes if defined?(@changes)
-            changes = super()
-            self.class.local_stored_attributes.each do |accessor, attributes|
-              next unless attribute_changed?(accessor)
-
-              prev_store, new_store = changes[accessor]
-              prev_store.each do |key, value|
-                if new_store[key] == value
-                  changes[accessor][0].except!(key)
-                  changes[accessor][1].except!(key)
-                end
-              end
-            end
-            @changes = changes
-          end
-        end
 
         _define_dirty_tracking_methods(store_name, keys + typed_keys.keys, prefix: accessor_prefix, suffix: accessor_suffix)
 
@@ -204,6 +185,24 @@ module ActiveRecord
 
       def _define_dirty_tracking_methods(store_attribute, keys, prefix: nil, suffix: nil)
         _store_accessors_module.module_eval do
+          define_method("changes") do
+            return @changes if defined?(@changes)
+            changes = super()
+            self.class.local_stored_attributes.each do |accessor, attributes|
+              next unless attribute_changed?(accessor)
+
+              prev_store, new_store = changes[accessor]
+
+              prev_store&.each do |key, value|
+                if new_store[key] == value
+                  prev_store.except!(key)
+                  new_store&.except!(key)
+                end
+              end
+            end
+            @changes = changes
+          end
+
           keys.flatten.each do |key|
             key = key.to_s
             accessor_key = "#{prefix}#{key}#{suffix}"
