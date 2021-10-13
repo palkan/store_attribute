@@ -186,12 +186,11 @@ module ActiveRecord
       def _define_dirty_tracking_methods(store_attribute, keys, prefix: nil, suffix: nil)
         _store_accessors_module.module_eval do
           define_method("changes") do
-            return @changes if defined?(@changes)
             changes = super()
             self.class.local_stored_attributes.each do |accessor, attributes|
               next unless attribute_changed?(accessor)
 
-              prev_store, new_store = changes[accessor]
+              prev_store, new_store = changes[accessor].map(&:dup)
 
               prev_store&.each do |key, value|
                 if new_store[key] == value
@@ -199,8 +198,10 @@ module ActiveRecord
                   new_store&.except!(key)
                 end
               end
+
+              changes[accessor] = prev_store, new_store
             end
-            @changes = changes
+            changes
           end
 
           keys.flatten.each do |key|

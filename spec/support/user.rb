@@ -23,7 +23,8 @@ class User < ActiveRecord::Base
 
   store_accessor :jparams, active: :boolean, birthday: :date, prefix: "json", suffix: "value"
 
-  store :custom, accessors: [price: :money_type]
+  store :custom, accessors: [:custom_date, price: :money_type]
+  after_initialize { self.custom_date = TODAY_DATE }
 
   store_accessor :hdata, visible: :boolean
 
