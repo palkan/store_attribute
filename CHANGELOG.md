@@ -2,6 +2,8 @@
 
 ## master
 
+## 0.9.2 (2021-10-13)
+
 - Fix bug with store mutation during changes calculation. ([@palkan][])
 
 ## 0.9.1
