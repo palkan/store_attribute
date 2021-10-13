@@ -292,6 +292,33 @@ describe StoreAttribute do
       expect(user.static_date_changed?).to be false
     end
 
+    it "works with reload" do
+      user.active = true
+      expect(user.changes["jparams"]).to eq([{}, {"active" => true}])
+      user.save!
+
+      user.reload
+      user.static_date = Date.today + 2.days
+
+      expect(user.static_date_changed?).to be true
+      expect(user.active_changed?).to be false
+    end
+
+    it "should not modify stores" do
+      user.price = 99.0
+      expect(user.changes["custom"]).to eq([{}, {"price" => 99}])
+      user.save!
+
+      user.reload
+      user.custom_date = Date.today + 2.days
+
+      expect(user.custom_date_changed?).to be true
+      expect(user.price_changed?).to be false
+      user.save!
+
+      expect(user.reload.price).to be 99
+    end
+
     # https://github.com/palkan/store_attribute/issues/19
     it "without defaults" do
       user = UserWithoutDefaults.new

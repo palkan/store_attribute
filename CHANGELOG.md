@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix bug with store mutation during changes calculation. ([@palkan][])
+
 ## 0.9.1
 
 - Fix bug with dirty nullable stores. ([@palkan][])
