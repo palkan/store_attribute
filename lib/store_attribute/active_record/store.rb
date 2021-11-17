@@ -208,6 +208,20 @@ module ActiveRecord
             changes
           end
 
+          define_method("changed") do
+            changes.keys
+          end
+
+          define_method("changed?") do
+            changes.any?
+          end
+
+          define_method("changed_attributes") do
+            changes.each_with_object({}) do |(key, (before, after)), hash|
+              hash[key] = before
+            end
+          end
+
           keys.flatten.each do |key|
             key = key.to_s
             accessor_key = "#{prefix}#{key}#{suffix}"
