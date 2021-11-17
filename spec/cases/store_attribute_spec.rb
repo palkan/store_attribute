@@ -319,6 +319,13 @@ describe StoreAttribute do
       expect(user.reload.price).to be 99
     end
 
+    it "should not include empty changes" do
+      reloaded_user = User.take
+      reloaded_user.inspect
+
+      expect(reloaded_user.changes).to eq({})
+    end
+
     # https://github.com/palkan/store_attribute/issues/19
     it "without defaults" do
       user = UserWithoutDefaults.new
