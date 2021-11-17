@@ -44,7 +44,7 @@ module ActiveRecord
       end
 
       def changed_in_place?(raw_old_value, new_value)
-        raw_old_value != serialize(new_value)
+        false
       end
 
       def serialize(value)

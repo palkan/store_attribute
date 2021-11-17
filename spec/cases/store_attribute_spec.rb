@@ -319,11 +319,25 @@ describe StoreAttribute do
       expect(user.reload.price).to be 99
     end
 
-    it "should not include empty changes" do
+    it "should not mark attributes as dirty after reading original values" do
       reloaded_user = User.take
       reloaded_user.inspect
 
       expect(reloaded_user.changes).to eq({})
+      expect(reloaded_user.changed_attributes).to eq({})
+      expect(reloaded_user.changed?).to be false
+    end
+
+    it "should not mark attributes as dirty after default values are set" do
+      new_user = User.new
+
+      expect(new_user.changed_attributes).to eq({"custom"=>{}})
+      expect(new_user.changed?).to be true
+
+      new_user.jparams
+
+      expect(new_user.changed_attributes).to eq({"custom"=>{}})
+      expect(new_user.changed?).to be true
     end
 
     # https://github.com/palkan/store_attribute/issues/19
