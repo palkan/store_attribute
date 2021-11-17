@@ -199,7 +199,11 @@ module ActiveRecord
                 end
               end
 
-              changes[accessor] = prev_store, new_store
+              if prev_store.empty? && new_store.empty?
+                changes.delete(accessor)
+              else
+                changes[accessor] = prev_store, new_store
+              end
             end
             changes
           end
