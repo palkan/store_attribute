@@ -43,7 +43,7 @@ module ActiveRecord
         hash
       end
 
-      def changed_in_place?(raw_old_value, new_value)
+      def changed_in_place?(_raw_old_value, _new_value)
         false
       end
 
