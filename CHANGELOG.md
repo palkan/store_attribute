@@ -2,6 +2,8 @@
 
 ## master
 
+## 0.9.3 (2021-11-17)
+
 - Fix keeping empty store hashes in the changes. ([@markedmondson][])
 
 See [PR#22](https://github.com/palkan/store_attribute/pull/22).
