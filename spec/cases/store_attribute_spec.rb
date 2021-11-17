@@ -331,12 +331,12 @@ describe StoreAttribute do
     it "should not mark attributes as dirty after default values are set" do
       new_user = User.new
 
-      expect(new_user.changed_attributes).to eq({"custom"=>{}})
+      expect(new_user.changed_attributes).to eq({"custom" => {}})
       expect(new_user.changed?).to be true
 
       new_user.jparams
 
-      expect(new_user.changed_attributes).to eq({"custom"=>{}})
+      expect(new_user.changed_attributes).to eq({"custom" => {}})
       expect(new_user.changed?).to be true
     end
 
