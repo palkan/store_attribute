@@ -2,6 +2,10 @@
 
 ## master
 
+- Fix keeping empty store hashes in the changes. ([@markedmondson][])
+
+See [PR#22](https://github.com/palkan/store_attribute/pull/22).
+
 ## 0.9.2 (2021-10-13)
 
 - Fix bug with store mutation during changes calculation. ([@palkan][])
