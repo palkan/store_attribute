@@ -34,9 +34,6 @@ jobs:
         - ruby: "2.6"
           postgres: "12"
           gemfile: "gemfiles/rails6.gemfile"
-        - ruby: "2.5"
-          postgres: "11"
-          gemfile: "gemfiles/rails5.gemfile"
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
