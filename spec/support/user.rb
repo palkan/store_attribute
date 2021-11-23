@@ -1,5 +1,20 @@
 # frozen_string_literal: true
 
+connection = ActiveRecord::Base.connection
+
+connection.drop_table "users", if_exists: true
+
+connection.transaction do
+  connection.create_table("users") do |t|
+    t.jsonb :extra
+    t.string :dyndate
+    t.string :statdate
+    t.jsonb :jparams, default: {}, null: false
+    t.text :custom
+    t.hstore :hdata, default: {}, null: false
+  end
+end
+
 class RawUser < ActiveRecord::Base
   self.table_name = "users"
 end
@@ -13,6 +28,9 @@ end
 class User < ActiveRecord::Base
   DEFAULT_DATE = ::Date.new(2019, 7, 17)
   TODAY_DATE = ::Date.today
+
+  attribute :dyndate, :datetime, default: -> { ::Time.now }
+  attribute :statdate, :datetime, default: ::Time.now
 
   store_accessor :jparams, :version, active: :boolean, salary: :integer
   store_attribute :jparams, :birthday, :date

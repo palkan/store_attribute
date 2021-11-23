@@ -2,6 +2,14 @@
 
 ## master
 
+## 1.0.0-dev
+
+- **Ruby 2.6+ and Rails 6+** is required.
+
+- Refactored internal implementation to use Rails Store implementation as much as possible. ([@palkan][])
+
+Use existing Attributes API and Store API instead of duplicating and monkey-patching. Dirty-tracking, accessors and prefixes/suffixes are now handled by Rails. We only provide type coercions for stores.
+
 ## 0.9.3 (2021-11-17)
 
 - Fix keeping empty store hashes in the changes. ([@markedmondson][])

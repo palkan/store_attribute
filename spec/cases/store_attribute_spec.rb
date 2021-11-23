@@ -3,23 +3,8 @@
 require "spec_helper"
 
 describe StoreAttribute do
-  before do
-    @connection = ActiveRecord::Base.connection
-
-    @connection.transaction do
-      @connection.create_table("users") do |t|
-        t.jsonb :extra
-        t.jsonb :jparams, default: {}, null: false
-        t.text :custom
-        t.hstore :hdata, default: {}, null: false
-      end
-    end
-
-    User.reset_column_information
-  end
-
   after do
-    @connection.drop_table "users", if_exists: true
+    User.delete_all
   end
 
   let(:date) { Date.new(2019, 7, 17) }
@@ -135,11 +120,13 @@ describe StoreAttribute do
       expect(jamie).to be_active
       expect(jamie.salary).to eq 12
 
+      jamie.salary = 13
+
       jamie.save!
 
       ron = RawUser.find(jamie.id)
       expect(ron.jparams["active"]).to eq true
-      expect(ron.jparams["salary"]).to eq 12
+      expect(ron.jparams["salary"]).to eq 13
     end
   end
 
@@ -324,6 +311,8 @@ describe StoreAttribute do
       reloaded_user.inspect
 
       expect(reloaded_user.changes).to eq({})
+      expect(reloaded_user.changed_attributes).to eq({})
+      expect(reloaded_user.changed?).to be false
     end
 
     # https://github.com/palkan/store_attribute/issues/19

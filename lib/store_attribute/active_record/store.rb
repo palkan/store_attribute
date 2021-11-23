@@ -2,11 +2,14 @@
 
 require "active_record/store"
 require "store_attribute/active_record/type/typed_store"
+require "store_attribute/active_record/mutation_tracker"
 
 module ActiveRecord
   module Store
     module ClassMethods # :nodoc:
       alias_method :_orig_store, :store
+      alias_method :_orig_store_accessor, :store_accessor
+
       # Defines store on this model.
       #
       # +store_name+ The name of the store.
@@ -57,13 +60,7 @@ module ActiveRecord
         keys = keys.flatten
         typed_keys = typed_keys.except(keys)
 
-        accessor_prefix, accessor_suffix = _normalize_prefix_suffix(store_name, prefix, suffix)
-
-        _define_accessors_methods(store_name, *keys, prefix: accessor_prefix, suffix: accessor_suffix)
-
-        _prepare_local_stored_attributes(store_name, *keys)
-
-        _define_dirty_tracking_methods(store_name, keys + typed_keys.keys, prefix: accessor_prefix, suffix: accessor_suffix)
+        _orig_store_accessor(store_name, *(keys - typed_keys.keys), prefix: nil, suffix: nil)
 
         typed_keys.each do |key, type|
           store_attribute(store_name, key, type, prefix: prefix, suffix: suffix)
@@ -121,55 +118,50 @@ module ActiveRecord
       #
       # For more examples on using types, see documentation for ActiveRecord::Attributes.
       def store_attribute(store_name, name, type, prefix: nil, suffix: nil, **options)
-        prefix, suffix = _normalize_prefix_suffix(store_name, prefix, suffix)
-
-        _define_accessors_methods(store_name, name, prefix: prefix, suffix: suffix)
-
+        _orig_store_accessor(store_name, name.to_s, prefix: prefix, suffix: suffix)
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
-        # Rails >6.0
-        if !respond_to?(:decorate_attribute_type) || method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 1
-          attr_name = store_name.to_s
-          was_type = attributes_to_define_after_schema_loads[attr_name]&.first
-          attribute(attr_name) do |subtype|
+        _define_store_attribute(store_name) if _local_typed_stored_attributes[store_name].empty?
+        _store_local_stored_attribute(store_name, name, type, **options)
+      end
+
+      def _store_local_stored_attribute(store_name, key, cast_type, default: Type::TypedStore::UNDEFINED, **options) # :nodoc:
+        cast_type = ActiveRecord::Type.lookup(cast_type, **options) if cast_type.is_a?(Symbol)
+        _local_typed_stored_attributes[store_name][key] = [cast_type, default]
+      end
+
+      def _local_typed_stored_attributes
+        return @local_typed_stored_attributes if instance_variable_defined?(:@local_typed_stored_attributes)
+
+        @local_typed_stored_attributes =
+          if superclass.respond_to?(:_local_typed_stored_attributes)
+            superclass._local_typed_stored_attributes.dup.tap do |h|
+              h.transform_values!(&:dup)
+            end
+          else
+            Hash.new { |h, k| h[k] = {}.with_indifferent_access }.with_indifferent_access
+          end
+      end
+
+      def _define_store_attribute(store_name)
+        attr_name = store_name.to_s
+        was_type = attributes_to_define_after_schema_loads[attr_name]&.first
+
+        defaultik = Type::TypedStore::Defaultik.new
+
+        attribute(attr_name, default: defaultik.proc) do |subtype|
+          subtypes = _local_typed_stored_attributes[attr_name]
+          type =
             if defined?(_lookup_cast_type)
-              Type::TypedStore.create_from_type(_lookup_cast_type(attr_name, was_type, {}), name, type, **options)
+              Type::TypedStore.create_from_type(_lookup_cast_type(attr_name, was_type, {}))
             else
-              Type::TypedStore.create_from_type(subtype, name, type, **options)
-            end
-          end
-        else
-          decorate_attribute_type(store_name, "typed_accessor_for_#{name}") do |subtype|
-            Type::TypedStore.create_from_type(subtype, name, type, **options)
-          end
-        end
-
-        _prepare_local_stored_attributes(store_name, name)
-
-        _define_dirty_tracking_methods(store_name, [name], prefix: prefix, suffix: suffix)
-      end
-
-      def _prepare_local_stored_attributes(store_name, *keys) # :nodoc:
-        # assign new store attribute and create new hash to ensure that each class in the hierarchy
-        # has its own hash of stored attributes.
-        self.local_stored_attributes ||= {}
-        self.local_stored_attributes[store_name] ||= []
-        self.local_stored_attributes[store_name] |= keys
-      end
-
-      def _define_accessors_methods(store_name, *keys, prefix: nil, suffix: nil) # :nodoc:
-        _store_accessors_module.module_eval do
-          keys.each do |key|
-            accessor_key = "#{prefix}#{key}#{suffix}"
-
-            define_method("#{accessor_key}=") do |value|
-              write_store_attribute(store_name, key, value)
+              Type::TypedStore.create_from_type(subtype)
             end
 
-            define_method(accessor_key) do
-              read_store_attribute(store_name, key)
-            end
-          end
+          defaultik.type = type
+          subtypes.each { |name, (cast_type, default)| type.add_typed_key(name, cast_type, default: default) }
+
+          type
         end
       end
 
@@ -181,94 +173,6 @@ module ActiveRecord
             send(name) == true
           end
         end
-      end
-
-      def _define_dirty_tracking_methods(store_attribute, keys, prefix: nil, suffix: nil)
-        _store_accessors_module.module_eval do
-          define_method("changes") do
-            changes = super()
-            self.class.local_stored_attributes.each do |accessor, attributes|
-              next unless attribute_changed?(accessor)
-
-              prev_store, new_store = changes[accessor].map(&:dup)
-
-              prev_store&.each do |key, value|
-                if new_store[key] == value
-                  prev_store.except!(key)
-                  new_store&.except!(key)
-                end
-              end
-
-              if prev_store.present? || new_store.present?
-                changes[accessor] = prev_store, new_store
-              else
-                changes.delete(accessor)
-              end
-            end
-            changes
-          end
-
-          keys.flatten.each do |key|
-            key = key.to_s
-            accessor_key = "#{prefix}#{key}#{suffix}"
-
-            define_method("#{accessor_key}_changed?") do
-              return false unless attribute_changed?(store_attribute)
-              prev_store, new_store = changes[store_attribute]
-              prev_store&.dig(key) != new_store&.dig(key)
-            end
-
-            define_method("#{accessor_key}_change") do
-              return unless attribute_changed?(store_attribute)
-              prev_store, new_store = changes[store_attribute]
-              [prev_store&.dig(key), new_store&.dig(key)]
-            end
-
-            define_method("#{accessor_key}_was") do
-              return unless attribute_changed?(store_attribute)
-              prev_store, _new_store = changes[store_attribute]
-              prev_store&.dig(key)
-            end
-
-            define_method("saved_change_to_#{accessor_key}?") do
-              return false unless saved_change_to_attribute?(store_attribute)
-              prev_store, new_store = saved_change_to_attribute(store_attribute)
-              prev_store&.dig(key) != new_store&.dig(key)
-            end
-
-            define_method("saved_change_to_#{accessor_key}") do
-              return unless saved_change_to_attribute?(store_attribute)
-              prev_store, new_store = saved_change_to_attribute(store_attribute)
-              [prev_store&.dig(key), new_store&.dig(key)]
-            end
-
-            define_method("#{accessor_key}_before_last_save") do
-              return unless saved_change_to_attribute?(store_attribute)
-              prev_store, _new_store = saved_change_to_attribute(store_attribute)
-              prev_store&.dig(key)
-            end
-          end
-        end
-      end
-
-      def _normalize_prefix_suffix(store_name, prefix, suffix)
-        prefix =
-          case prefix
-          when String, Symbol
-            "#{prefix}_"
-          when TrueClass
-            "#{store_name}_"
-          end
-
-        suffix =
-          case suffix
-          when String, Symbol
-            "_#{suffix}"
-          when TrueClass
-            "_#{store_name}"
-          end
-
-        [prefix, suffix]
       end
     end
   end
