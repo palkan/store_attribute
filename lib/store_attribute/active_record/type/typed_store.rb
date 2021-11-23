@@ -5,12 +5,22 @@ require "active_record/type"
 module ActiveRecord
   module Type # :nodoc:
     class TypedStore < DelegateClass(ActiveRecord::Type::Value) # :nodoc:
+      class Defaultik
+        attr_accessor :type
+
+        def proc
+          @proc ||= Kernel.proc do
+            raise ArgumentError, "Has no type attached" unless type
+
+            type.build_defaults
+          end
+        end
+      end
+
       # Creates +TypedStore+ type instance and specifies type caster
       # for key.
-      def self.create_from_type(basetype, key, type, **options)
-        typed_store = new(basetype)
-        typed_store.add_typed_key(key, type, **options)
-        typed_store
+      def self.create_from_type(basetype, **options)
+        new(basetype)
       end
 
       def initialize(subtype)
@@ -21,7 +31,6 @@ module ActiveRecord
       end
 
       UNDEFINED = Object.new
-      private_constant :UNDEFINED
 
       def add_typed_key(key, type, default: UNDEFINED, **options)
         type = ActiveRecord::Type.lookup(type, **options) if type.is_a?(Symbol)
@@ -36,15 +45,13 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.deserialize(hash[key])
-          elsif defaults.key?(key)
-            hash[key] = get_default(key)
           end
         end
         hash
       end
 
       def changed_in_place?(raw_old_value, new_value)
-        raw_old_value != serialize(new_value)
+        deserialize(raw_old_value) != new_value
       end
 
       def serialize(value)
@@ -55,8 +62,6 @@ module ActiveRecord
           next unless key
           if value.key?(key)
             typed_casted[key] = type.serialize(value[key])
-          elsif defaults.key?(str_key)
-            typed_casted[key] = type.serialize(get_default(str_key))
           end
         end
         super(value.merge(typed_casted))
@@ -68,8 +73,6 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.cast(hash[key])
-          elsif defaults.key?(key)
-            hash[key] = get_default(key)
           end
         end
         hash
@@ -86,6 +89,12 @@ module ActiveRecord
 
       delegate :read, :prepare, to: :store_accessor
 
+      def build_defaults
+        defaults.transform_values do |val|
+          val.is_a?(Proc) ? val.call : val
+        end.with_indifferent_access
+      end
+
       protected
 
       # We cannot rely on string keys 'cause user input can contain symbol keys
@@ -101,11 +110,6 @@ module ActiveRecord
 
       def type_for(key)
         accessor_types.fetch(key.to_s)
-      end
-
-      def get_default(key)
-        value = defaults.fetch(key)
-        value.is_a?(Proc) ? value.call : value
       end
 
       attr_reader :accessor_types, :defaults, :store_accessor

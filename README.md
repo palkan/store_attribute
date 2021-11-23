@@ -6,15 +6,16 @@
 
 ActiveRecord extension which adds typecasting to store accessors.
 
-Compatible with Rails 4.2 and Rails 5+.
-
-Extracted from not merged PR to Rails: [rails/rails#18942](https://github.com/rails/rails/pull/18942).
+Originally extracted from not merged PR to Rails: [rails/rails#18942](https://github.com/rails/rails/pull/18942).
 
 ### Install
 
 In your Gemfile:
 
 ```ruby
+# for Rails 6+ (7 is supported)
+gem "store_attribute", "~> 1.0"
+
 # for Rails 5+ (6 is supported)
 gem "store_attribute", "~> 0.8.0"
 
@@ -31,6 +32,7 @@ store_attribute(store_name, name, type, options)
 ```
 
 Where:
+
 - `store_name` The name of the store.
 - `name` The name of the accessor to the store.
 - `type` A symbol such as `:string` or `:integer`, or a type object to be used for the accessor.
