@@ -337,4 +337,51 @@ describe StoreAttribute do
       expect(dummy.custom).to eq({"key" => "text"})
     end
   end
+
+  context "with concerns" do
+    let(:concern) do
+      # https://github.com/palkan/store_attribute/pull/24#issuecomment-999833947
+      Module.new do
+        extend ActiveSupport::Concern
+
+        included do
+          store_accessor :extra, beginning_of_week: :integer
+
+          include(Module.new do
+            def beginning_of_week
+              super || 6
+            end
+          end)
+        end
+      end
+    end
+
+    let(:raw_klass) do
+      Class.new(RawUser).tap do |kl|
+        kl.include concern
+      end
+    end
+
+    let(:klass) do
+      Class.new(User).tap do |kl|
+        kl.include concern
+      end
+    end
+
+    specify do
+      user = klass.new
+      expect(user.beginning_of_week).to eq 6
+      user.save!
+
+      expect(klass.type_for_attribute(:extra).inspect).to include(
+        "ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Jsonb"
+      )
+      expect(raw_klass.type_for_attribute(:extra).inspect).to include(
+        "ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Jsonb"
+      )
+
+      reuser = klass.find(user.id)
+      expect(reuser.beginning_of_week).to eq 6
+    end
+  end
 end
