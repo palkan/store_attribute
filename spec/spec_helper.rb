@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-begin
-  require "debug"
-rescue LoadError
-end
-
 require "active_record"
 require "pg"
 require "store_attribute"
