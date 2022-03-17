@@ -155,13 +155,9 @@ module ActiveRecord
 
         attribute(attr_name, default: defaultik.proc) do |subtype|
           subtypes = _local_typed_stored_attributes[attr_name]
-          type =
-            if defined?(_lookup_cast_type)
-              Type::TypedStore.create_from_type(_lookup_cast_type(attr_name, was_type, {}))
-            else
-              Type::TypedStore.create_from_type(subtype)
-            end
+          subtype = _lookup_cast_type(attr_name, was_type, {}) if defined?(_lookup_cast_type)
 
+          type = Type::TypedStore.create_from_type(subtype)
           defaultik.type = type
           subtypes.each { |name, (cast_type, default)| type.add_typed_key(name, cast_type, default: default) }
 

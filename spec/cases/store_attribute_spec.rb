@@ -396,5 +396,20 @@ describe StoreAttribute do
         some_flag: true
       )
     end
+
+    specify "double encoding" do
+      user = klass.create!(inner_json: %w[kis kis])
+
+      user = klass.find(user.id)
+      expect(user).to have_attributes(
+        inner_json: %w[kis kis]
+      )
+
+      # Parent class should also be able to decode the attribute
+      pre_user = User.find(user.id)
+      expect(pre_user).to have_attributes(
+        inner_json: %w[kis kis]
+      )
+    end
   end
 end

@@ -20,6 +20,8 @@ module ActiveRecord
       # Creates +TypedStore+ type instance and specifies type caster
       # for key.
       def self.create_from_type(basetype, **options)
+        return basetype.dup if basetype.is_a?(self)
+
         new(basetype)
       end
 
@@ -93,6 +95,13 @@ module ActiveRecord
         defaults.transform_values do |val|
           val.is_a?(Proc) ? val.call : val
         end.with_indifferent_access
+      end
+
+      def dup
+        self.class.new(__getobj__).tap do |dtype|
+          dtype.accessor_types.merge!(accessor_types)
+          dtype.defaults.merge!(defaults)
+        end
       end
 
       protected

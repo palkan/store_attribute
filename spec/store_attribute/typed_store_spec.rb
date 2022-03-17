@@ -79,6 +79,7 @@ describe ActiveRecord::Type::TypedStore do
       it "creates with valid types", :aggregate_failures do
         type = described_class.create_from_type(json_type)
         type.add_typed_key("date", :date)
+
         new_type = described_class.create_from_type(type)
         new_type.add_typed_key("val", :integer)
 
