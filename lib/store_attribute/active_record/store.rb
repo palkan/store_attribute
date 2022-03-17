@@ -7,8 +7,8 @@ require "store_attribute/active_record/mutation_tracker"
 module ActiveRecord
   module Store
     module ClassMethods # :nodoc:
-      alias_method :_orig_store, :store
-      alias_method :_orig_store_accessor, :store_accessor
+      alias_method :_orig_store_without_types, :store
+      alias_method :_orig_store_accessor_without_types, :store_accessor
 
       # Defines store on this model.
       #
@@ -35,7 +35,7 @@ module ActiveRecord
             {}
           end
 
-        _orig_store(store_name, options)
+        _orig_store_without_types(store_name, options)
         store_accessor(store_name, *accessors, **typed_accessors) if accessors
       end
 
@@ -60,7 +60,7 @@ module ActiveRecord
         keys = keys.flatten
         typed_keys = typed_keys.except(keys)
 
-        _orig_store_accessor(store_name, *(keys - typed_keys.keys), prefix: nil, suffix: nil)
+        _orig_store_accessor_without_types(store_name, *(keys - typed_keys.keys), prefix: nil, suffix: nil)
 
         typed_keys.each do |key, type|
           store_attribute(store_name, key, type, prefix: prefix, suffix: suffix)
@@ -118,7 +118,7 @@ module ActiveRecord
       #
       # For more examples on using types, see documentation for ActiveRecord::Attributes.
       def store_attribute(store_name, name, type, prefix: nil, suffix: nil, **options)
-        _orig_store_accessor(store_name, name.to_s, prefix: prefix, suffix: suffix)
+        _orig_store_accessor_without_types(store_name, name.to_s, prefix: prefix, suffix: suffix)
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
         _define_store_attribute(store_name) if !_local_typed_stored_attributes? || _local_typed_stored_attributes[store_name].empty?
