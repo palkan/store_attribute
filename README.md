@@ -100,3 +100,48 @@ class User < ActiveRecord::Base
   store :settings, accessors: [:color, :homepage, login_at: :datetime], coder: JSON
 end
 ```
+
+### Using defaults
+
+With `store_attribute`, you can provide default values for the store attribute. This functionality follows Rails behaviour for `attribute ..., default: ...` (and is backed by Attribute API).
+
+You must remember two things when using defaults:
+
+- A default value is only populated if no value for the **store** attribute was set, i.e., only when creating a new record.
+- Default values persist as soon as you save the record.
+
+The examples below demonstrate these caveats:
+
+```ruby
+# Database schema
+create_table("users") do |t|
+  t.string :name
+  t.jsonb :extra
+end
+
+class RawUser < ActiveRecord::Base
+  self.table_name = "users"
+end
+
+class User < ActiveRecord::Base
+  attribute :name, :string, default: "Joe"
+  store_attribute :extra, :expired_at, :date, default: -> { 2.days.from_now }
+end
+
+Date.current #=> 2022-03-17
+
+user = User.new
+user.name #=> "john"
+user.expired_at #=> 2022-03-19
+user.save!
+
+raw_user = RawUser.find(user.id)
+user.name #=> "john"
+user.expired_at #=> 2022-03-19
+
+another_raw_user = RawUser.create!
+another_user = User.find(another_raw_user.id)
+
+user.name #=> nil
+user.expired_at #=> nil
+```

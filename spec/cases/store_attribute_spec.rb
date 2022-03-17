@@ -367,6 +367,8 @@ describe StoreAttribute do
     let(:klass) do
       Class.new(User).tap do |kl|
         kl.store_attribute :jparams, :some_flag, :boolean, default: true
+        # Use this attribute to compare the behaviour of store vs regular attributes default values
+        kl.attribute :name, :string, default: "john"
 
         kl.include concern
       end
@@ -395,6 +397,50 @@ describe StoreAttribute do
         beginning_of_week: 4,
         some_flag: true
       )
+    end
+
+    specify "defaults persistence" do
+      user = klass.new
+      expect(user.some_flag).to eq(true)
+      expect(user.name).to eq("john")
+      user.save!
+
+      user = RawUser.find(user.id)
+      # Defaults persist
+      expect(user).to have_attributes(
+        name: "john",
+        jparams: a_hash_including("some_flag" => true)
+      )
+    end
+
+    specify "defaults inheritance vs persistence" do
+      user = User.create!
+      expect(user.jparams).not_to be_empty
+
+      user = klass.find(user.id)
+      user.name
+
+      # Default values are only populated for new records
+      expect(user).to have_attributes(
+        name: nil,
+        some_flag: nil
+      )
+    end
+
+    specify "defaults vs user input" do
+      user = klass.create!(jparams: {some_flag: false})
+      user = RawUser.find(user.id)
+
+      # When store is set explicitly by user,
+      # no defaults are populated
+      expect(user.jparams).to eq(
+        "some_flag" => false
+      )
+
+      user = klass.create!(some_flag: false)
+      user = RawUser.find(user.id)
+
+      expect(user.jparams.keys).to include("some_flag", "static_date", "dynamic_date")
     end
 
     specify "double encoding" do
