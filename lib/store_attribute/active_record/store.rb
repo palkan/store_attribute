@@ -121,7 +121,7 @@ module ActiveRecord
         _orig_store_accessor(store_name, name.to_s, prefix: prefix, suffix: suffix)
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
-        _define_store_attribute(store_name) if _local_typed_stored_attributes[store_name].empty?
+        _define_store_attribute(store_name) if !_local_typed_stored_attributes? || _local_typed_stored_attributes[store_name].empty?
         _store_local_stored_attribute(store_name, name, type, **options)
       end
 
@@ -130,8 +130,12 @@ module ActiveRecord
         _local_typed_stored_attributes[store_name][key] = [cast_type, default]
       end
 
+      def _local_typed_stored_attributes?
+        instance_variable_defined?(:@local_typed_stored_attributes)
+      end
+
       def _local_typed_stored_attributes
-        return @local_typed_stored_attributes if instance_variable_defined?(:@local_typed_stored_attributes)
+        return @local_typed_stored_attributes if _local_typed_stored_attributes?
 
         @local_typed_stored_attributes =
           if superclass.respond_to?(:_local_typed_stored_attributes)

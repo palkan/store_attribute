@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "debug" unless ENV["CI"]
 require "active_record"
 require "pg"
 require "store_attribute"
