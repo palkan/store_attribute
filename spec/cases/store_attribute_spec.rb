@@ -359,11 +359,15 @@ describe StoreAttribute do
     let(:raw_klass) do
       Class.new(RawUser).tap do |kl|
         kl.include concern
+
+        kl.store_attribute :jparams, :some_flag, :boolean, default: true
       end
     end
 
     let(:klass) do
       Class.new(User).tap do |kl|
+        kl.store_attribute :jparams, :some_flag, :boolean, default: true
+
         kl.include concern
       end
     end
@@ -371,17 +375,26 @@ describe StoreAttribute do
     specify do
       user = klass.new
       expect(user.beginning_of_week).to eq 6
+      expect(user.some_flag).to eq(true)
       user.save!
 
-      expect(klass.type_for_attribute(:extra).inspect).to include(
-        "ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Jsonb"
-      )
-      expect(raw_klass.type_for_attribute(:extra).inspect).to include(
-        "ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Jsonb"
+      user = klass.find(user.id)
+      expect(user).to have_attributes(
+        beginning_of_week: 6,
+        some_flag: true
       )
 
-      reuser = klass.find(user.id)
-      expect(reuser.beginning_of_week).to eq 6
+      ruser = raw_klass.new(beginning_of_week: "4")
+
+      expect(ruser.beginning_of_week).to eq 4
+      expect(ruser.some_flag).to eq(true)
+      ruser.save!
+
+      ruser = raw_klass.find(ruser.id)
+      expect(ruser).to have_attributes(
+        beginning_of_week: 4,
+        some_flag: true
+      )
     end
   end
 end
