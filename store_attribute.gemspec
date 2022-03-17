@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
     "source_code_uri" => "http://github.com/palkan/store_attribute"
   }
 
-  s.add_runtime_dependency "activerecord", ">= 5.0"
+  s.add_runtime_dependency "activerecord", ">= 6.0"
 
   s.add_development_dependency "pg", ">= 0.18"
   s.add_development_dependency "rake", ">= 13.0"
