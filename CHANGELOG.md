@@ -2,7 +2,7 @@
 
 ## master
 
-## 1.0.0-dev
+## 1.0.0 (2022-03-17)
 
 - **Ruby 2.6+ and Rails 6+** is required.
 
