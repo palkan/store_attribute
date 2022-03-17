@@ -6,6 +6,7 @@ connection.drop_table "users", if_exists: true
 
 connection.transaction do
   connection.create_table("users") do |t|
+    t.string :name
     t.jsonb :extra
     t.string :dyndate
     t.string :statdate
