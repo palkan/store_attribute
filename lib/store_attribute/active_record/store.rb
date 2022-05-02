@@ -182,8 +182,27 @@ module ActiveRecord
       end
 
       def _define_predicate_method(name, prefix: nil, suffix: nil)
+        accessor_prefix =
+          case prefix
+          when String, Symbol
+            "#{prefix}_"
+          when TrueClass
+            "#{name}_"
+          else
+            ""
+          end
+        accessor_suffix =
+          case suffix
+          when String, Symbol
+            "_#{suffix}"
+          when TrueClass
+            "_#{name}"
+          else
+            ""
+          end
+
         _store_accessors_module.module_eval do
-          name = "#{prefix}#{name}#{suffix}"
+          name = "#{accessor_prefix}#{name}#{accessor_suffix}"
 
           define_method("#{name}?") do
             send(name) == true
