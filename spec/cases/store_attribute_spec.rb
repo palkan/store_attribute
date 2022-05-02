@@ -222,6 +222,7 @@ describe StoreAttribute do
       jamie = User.find(jamie.id)
 
       expect(jamie.json_active_value).to eql(true)
+      expect(jamie.json_active_value?).to eql(true)
       expect(jamie.json_birthday_value).to eq(Time.local(2019, 6, 26).to_date)
 
       jamie.json_active_value = false
