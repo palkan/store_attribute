@@ -2,6 +2,10 @@
 
 ## master
 
+## 1.0.1 (2022-05-05)
+
+- Fixed suffix/prefix for predicates. ([@Alan-Marx](https://github.com/Alan-Marx))
+
 ## 1.0.0 (2022-03-17)
 
 - **Ruby 2.6+ and Rails 6+** is required.
