@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   attribute :statdate, :datetime, default: ::Time.now
 
   store_accessor :jparams, :version, active: :boolean, salary: :integer
+  store_accessor :jparams, :version, prefix: :pre, suffix: :suf
   store_attribute :jparams, :birthday, :date
   store_attribute :jparams, :static_date, :date, default: DEFAULT_DATE
   store_attribute :jparams, :dynamic_date, :date, default: -> { TODAY_DATE }

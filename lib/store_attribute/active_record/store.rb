@@ -60,7 +60,7 @@ module ActiveRecord
         keys = keys.flatten
         typed_keys = typed_keys.except(keys)
 
-        _orig_store_accessor_without_types(store_name, *(keys - typed_keys.keys), prefix: nil, suffix: nil)
+        _orig_store_accessor_without_types(store_name, *(keys - typed_keys.keys), prefix: prefix, suffix: suffix)
 
         typed_keys.each do |key, type|
           store_attribute(store_name, key, type, prefix: prefix, suffix: suffix)

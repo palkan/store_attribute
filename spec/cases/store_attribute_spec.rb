@@ -233,6 +233,12 @@ describe StoreAttribute do
 
       expect(jamie.saved_change_to_json_active_value).to eq([true, false])
     end
+
+    it "should preserve prefix/suffix for store_accessor without types" do
+      jamie = User.create!(jparams: {version: "x"})
+
+      expect(jamie.pre_version_suf).to eq("x")
+    end
   end
 
   context "dirty tracking" do
