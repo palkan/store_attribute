@@ -25,6 +25,9 @@ jobs:
           "gemfiles/rails6.gemfile"
         ]
         include:
+        - ruby: "3.1"
+          postgres: "14"
+          gemfile: "gemfiles/rails7.gemfile"
         - ruby: "3.0"
           postgres: "13"
           gemfile: "gemfiles/railsmaster.gemfile"
