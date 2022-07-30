@@ -110,9 +110,9 @@ describe StoreAttribute do
     it "re-typecast old data" do
       jamie = User.create!
       User.update_all(
-        "jparams = '{"\
-          '"active":"1",'\
-          '"salary":"12.02"'\
+        "jparams = '{" \
+          '"active":"1",' \
+          '"salary":"12.02"' \
         "}'::jsonb"
       )
 
