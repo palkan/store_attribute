@@ -16,6 +16,11 @@ connection.transaction do
   end
 end
 
+# See https://github.com/rails/rails/issues/45585
+if ActiveRecord.respond_to?(:use_yaml_unsafe_load)
+  ActiveRecord.use_yaml_unsafe_load = true
+end
+
 class RawUser < ActiveRecord::Base
   self.table_name = "users"
 end
