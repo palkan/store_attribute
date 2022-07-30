@@ -113,8 +113,15 @@ describe ActiveRecord::Type::TypedStore do
       expect(subject.cast("date" => "2016-06-22")).to eq("date" => date)
       expect(subject.deserialize("---\n:date: 2016-06-22\n")).to eq("date" => date)
       expect(subject.deserialize("---\ndate: 2016-06-22\n")).to eq("date" => date)
-      expect(subject.serialize(date: date)).to eq "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2016-06-22\n"
-      expect(subject.serialize("date" => date)).to eq "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2016-06-22\n"
+
+      # https://github.com/rails/rails/pull/45591
+      if ::ActiveRecord::VERSION::MAJOR >= 7 && ::ActiveRecord::VERSION::MINOR >= 1
+        expect(subject.serialize(date: date)).to eq "---\n:date: 2016-06-22\n"
+        expect(subject.serialize("date" => date)).to eq "---\ndate: 2016-06-22\n"
+      else
+        expect(subject.serialize(date: date)).to eq "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2016-06-22\n"
+        expect(subject.serialize("date" => date)).to eq "--- !ruby/hash:ActiveSupport::HashWithIndifferentAccess\ndate: 2016-06-22\n"
+      end
     end
   end
 end

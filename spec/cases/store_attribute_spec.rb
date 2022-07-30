@@ -2,6 +2,20 @@
 
 require "spec_helper"
 
+using(Module.new do
+  unless Time.now.respond_to?(:to_fs)
+    refine Time do
+      alias_method :to_fs, :to_s
+    end
+  end
+
+  unless Psych.respond_to?(:unsafe_load)
+    refine Psych.singleton_class do
+      alias_method :unsafe_load, :load
+    end
+  end
+end)
+
 describe StoreAttribute do
   after do
     User.delete_all
@@ -55,7 +69,7 @@ describe StoreAttribute do
 
     it "YAML roundtrip" do
       user = User.create!(visible: "0", login_at: time_str)
-      dumped = YAML.load(YAML.dump(user)) # rubocop:disable Security/YAMLLoad
+      dumped = YAML.unsafe_load(YAML.dump(user))
 
       expect(dumped.visible).to be false
       expect(dumped.login_at).to eq time
@@ -248,7 +262,7 @@ describe StoreAttribute do
     before do
       user.price = "$ 123"
       user.visible = false
-      user.login_at = now.to_s(:db)
+      user.login_at = now.to_fs(:db)
     end
 
     it "should report changes" do
@@ -265,7 +279,7 @@ describe StoreAttribute do
       expect(user.login_at_change[1].to_i).to eq now.to_i
       expect(user.login_at_was).to eq nil
 
-      expect(user.changes["hdata"]).to eq [{}, {"login_at" => now.to_s(:db), "visible" => false}]
+      expect(user.changes["hdata"]).to eq [{}, {"login_at" => now.to_fs(:db), "visible" => false}]
     end
 
     it "should report saved changes" do

@@ -2,6 +2,12 @@
 
 ## master
 
+## 1.0.2 (2022-07-29)
+
+- Fix possible conflicts with Active Model objects. ([@palkan][])
+
+- Fix passing suffix/prefix to `store_accessor` without types. ([@palkan][])
+
 ## 1.0.1 (2022-05-05)
 
 - Fixed suffix/prefix for predicates. ([@Alan-Marx](https://github.com/Alan-Marx))

@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 require "debug" unless ENV["CI"]
+
+begin
+  gem "psych", "< 4"
+  require "psych"
+rescue Gem::LoadError
+end
+
 require "active_record"
 require "pg"
 require "store_attribute"
