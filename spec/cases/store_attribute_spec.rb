@@ -479,4 +479,21 @@ describe StoreAttribute do
       )
     end
   end
+
+  context "with validations" do
+    let(:dummy_class) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "users"
+
+        store_accessor :jparams, :required_key
+        store_attribute :jparams, :required_key, :string, default: "value"
+
+        validates :required_key, presence: true
+      end
+    end
+
+    it "defaults are considered in validations" do
+      expect(dummy_class.new).to be_valid
+    end
+  end
 end
