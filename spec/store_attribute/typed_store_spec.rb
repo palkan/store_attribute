@@ -115,7 +115,7 @@ describe ActiveRecord::Type::TypedStore do
       expect(subject.deserialize("---\ndate: 2016-06-22\n")).to eq("date" => date)
 
       # https://github.com/rails/rails/pull/45591
-      if ::ActiveRecord::VERSION::MAJOR >= 7 && ::ActiveRecord::VERSION::MINOR >= 1
+      if ::ActiveRecord::VERSION::MAJOR >= 7
         expect(subject.serialize(date: date)).to eq "---\n:date: 2016-06-22\n"
         expect(subject.serialize("date" => date)).to eq "---\ndate: 2016-06-22\n"
       else
