@@ -488,7 +488,7 @@ describe StoreAttribute do
         store_accessor :jparams, :required_key
         store_attribute :jparams, :required_key, :string, default: "value"
 
-        validates :required_key, presence: true
+        validates :jparams, :required_key, presence: true
       end
     end
 
