@@ -131,17 +131,17 @@ end
 Date.current #=> 2022-03-17
 
 user = User.new
-user.name #=> "john"
+user.name #=> "Joe"
 user.expired_at #=> 2022-03-19
 user.save!
 
 raw_user = RawUser.find(user.id)
-user.name #=> "john"
-user.expired_at #=> 2022-03-19
+raw_user.name #=> "Joe"
+raw_user.expired_at #=> 2022-03-19
 
 another_raw_user = RawUser.create!
 another_user = User.find(another_raw_user.id)
 
-user.name #=> nil
-user.expired_at #=> nil
+another_user.name #=> nil
+another_user.expired_at #=> nil
 ```
