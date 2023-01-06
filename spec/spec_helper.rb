@@ -14,6 +14,8 @@ require "openssl"
 require "pg"
 require "store_attribute"
 
+StoreAttribute.store_attribute_register_attributes = true
+
 connection_params =
   if ENV.key?("DATABASE_URL")
     {"url" => ENV["DATABASE_URL"]}
