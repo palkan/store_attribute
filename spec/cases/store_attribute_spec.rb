@@ -331,6 +331,24 @@ describe StoreAttribute do
     end
   end
 
+  context "attributes" do
+    it "should register all store_attributes as attributes" do
+      expect(User.attribute_types).to include(
+        'active' => an_instance_of(ActiveModel::Type::Boolean),
+        'salary' => an_instance_of(ActiveModel::Type::Integer),
+        'birthday' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        'static_date' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        'dynamic_date' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        'empty_date' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        'inner_json' => an_instance_of(ActiveRecord::Type::Json),
+        'price' => an_instance_of(MoneyType),
+        'visible' => an_instance_of(ActiveModel::Type::Boolean),
+        'ratio' => an_instance_of(ActiveModel::Type::Integer),
+        'login_at' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::DateTime),
+      )
+    end
+  end
+
   context "dirty tracking" do
     let(:user) { User.create! }
     let(:now) { Time.now.utc }
