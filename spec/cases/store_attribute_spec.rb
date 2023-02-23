@@ -257,7 +257,7 @@ describe StoreAttribute do
 
   context "dirty tracking" do
     let(:user) { User.create! }
-    let(:now) { Time.now }
+    let(:now) { Time.now.utc }
 
     before do
       user.price = "$ 123"

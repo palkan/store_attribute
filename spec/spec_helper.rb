@@ -22,6 +22,11 @@ connection_params =
     }
   end
 
+if ActiveRecord.respond_to?(:use_yaml_unsafe_load)
+  ActiveRecord.use_yaml_unsafe_load = false
+  ActiveRecord.yaml_column_permitted_classes << Date
+end
+
 ActiveRecord::Base.establish_connection(
   {
     "adapter" => "postgresql",
