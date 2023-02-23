@@ -36,7 +36,7 @@ Where:
 - `store_name` The name of the store.
 - `name` The name of the accessor to the store.
 - `type` A symbol such as `:string` or `:integer`, or a type object to be used for the accessor.
-- `options` (optional) A hash of cast type options such as `precision`, `limit`, `scale`, `default`.
+- `options` (optional) A hash of cast type options such as `precision`, `limit`, `scale`, `default`. Regular `store_accessor` options, such as `prefix`, `suffix` are also supported.
 
 Type casting occurs every time you write data through accessor or update store itself
 and when object is loaded from database.
