@@ -38,13 +38,13 @@ describe ActiveRecord::Type::TypedStore do
       it "with no default" do
         subject.add_typed_key("val", :integer)
 
-        expect(subject.deserialize('{}')).to eq({})
+        expect(subject.deserialize("{}")).to eq({})
       end
 
       it "with default" do
         subject.add_typed_key("val", :integer, default: 1)
 
-        expect(subject.deserialize('{}')).to eq({})
+        expect(subject.deserialize("{}")).to eq({})
       end
 
       it "with default configured to read_unset_returns_default" do
@@ -52,7 +52,7 @@ describe ActiveRecord::Type::TypedStore do
 
         subject.add_typed_key("val", :integer, default: 1)
 
-        expect(subject.deserialize('{}')).to eq("val" => 1)
+        expect(subject.deserialize("{}")).to eq("val" => 1)
       end
     end
 
