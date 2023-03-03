@@ -2,6 +2,8 @@
 
 ## master
 
+- Register store_attributes as attributes. ([@rickcsong](https://github.com/rickcsong))
+
 ## 1.0.2 (2022-07-29)
 
 - Fix possible conflicts with Active Model objects. ([@palkan][])
