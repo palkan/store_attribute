@@ -2,6 +2,8 @@
 
 ## master
 
+- Allow configurable to return default values when attribute key is not present in the serialized value ([@markedmondson][])
+
 ## 1.0.2 (2022-07-29)
 
 - Fix possible conflicts with Active Model objects. ([@palkan][])
