@@ -145,3 +145,12 @@ another_user = User.find(another_raw_user.id)
 another_user.name #=> nil
 another_user.expired_at #=> nil
 ```
+
+It is possible to configure `store_attribute` to return the default value even when the record is persisted and the attribute name is not present. By using the `StoreAttribute.configuration.read_unset_returns_default = true`, default values will be returned for missing keys. For example:
+
+```ruby
+StoreAttribute.configuration.read_unset_returns_default = true
+user = User.create!(extra: {})
+user.expired_at => #=> 2022-03-19
+```
+
