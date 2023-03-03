@@ -228,6 +228,23 @@ describe StoreAttribute do
       jamie.active = true
       expect(jamie.changes).to eq({"hdata" => [{}, {"visible" => true}], "jparams" => [{}, {"active" => true}]})
     end
+
+    it "should not return defaults for missing attributes" do
+      jamie = User.create!(jparams: {})
+      expect(jamie.static_date).to be_nil
+      expect(jamie.dynamic_date).to be_nil
+    end
+
+    it "should set defaults for missing attributes when configured" do
+      StoreAttribute.configuration.read_unset_returns_default = true
+
+      jamie = User.create!(jparams: {})
+      jamie = User.find(jamie.id)
+      expect(jamie.static_date).to eq(date)
+      expect(jamie.dynamic_date).to eq(dynamic_date)
+    ensure
+      StoreAttribute.configuration.read_unset_returns_default = false
+    end
   end
 
   context "prefix/suffix" do
@@ -342,6 +359,21 @@ describe StoreAttribute do
       user.birthday = "2019-06-26"
 
       expect(user.birthday_changed?).to eq true
+    end
+
+    it "with defaults for missing attributes" do
+      jamie = User.create!(jparams: {})
+
+      expect(jamie.changes).to eq({})
+    end
+
+    it "with defaults for missing attributes when configured" do
+      StoreAttribute.configuration.read_unset_returns_default = true
+      jamie = User.create!(jparams: {})
+
+      expect(jamie.changes).to eq({})
+    ensure
+      StoreAttribute.configuration.read_unset_returns_default = false
     end
   end
 

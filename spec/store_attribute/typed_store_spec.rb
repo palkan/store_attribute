@@ -34,6 +34,26 @@ describe ActiveRecord::Type::TypedStore do
         date = ::Date.new(2016, 6, 22)
         expect(subject.deserialize('{"date":"2016-06-22"}')).to eq("date" => date)
       end
+
+      it "with no default" do
+        subject.add_typed_key("val", :integer)
+
+        expect(subject.deserialize('{}')).to eq({})
+      end
+
+      it "with default" do
+        subject.add_typed_key("val", :integer, default: 1)
+
+        expect(subject.deserialize('{}')).to eq({})
+      end
+
+      it "with default configured to read_unset_returns_default" do
+        StoreAttribute.configuration.read_unset_returns_default = true
+
+        subject.add_typed_key("val", :integer, default: 1)
+
+        expect(subject.deserialize('{}')).to eq("val" => 1)
+      end
     end
 
     describe "#serialize" do

@@ -47,6 +47,8 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.deserialize(hash[key])
+          elsif StoreAttribute.configuration.read_unset_returns_default && defaults.key?(key)
+            hash[key] = built_defaults[key]
           end
         end
         hash
@@ -105,6 +107,10 @@ module ActiveRecord
       end
 
       protected
+
+      def built_defaults
+        @built_defaults ||= build_defaults
+      end
 
       # We cannot rely on string keys 'cause user input can contain symbol keys
       def key_to_cast(val, key)
