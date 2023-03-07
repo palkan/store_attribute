@@ -235,15 +235,38 @@ describe StoreAttribute do
       expect(jamie.dynamic_date).to be_nil
     end
 
-    it "should set defaults for missing attributes when configured" do
-      StoreAttribute.configuration.read_unset_returns_default = true
+    it "should set defaults for missing attributes when configured", :aggregate_failures do
+      klass = Class.new(User) do
+        self.store_attribute_unset_values_fallback_to_default = true
+
+        # We must redeclare at least a single attribute to associate it with the new class
+        store_attribute :jparams, :static_date, :date, default: User::DEFAULT_DATE
+      end
+
+      subklass = Class.new(klass) do
+        store_attribute :jparams, :non_default, :string, default: "no"
+      end
+
+      subsubklass = Class.new(subklass) do
+        self.store_attribute_unset_values_fallback_to_default = false
+
+        store_attribute :jparams, :non_default, :string, default: "no"
+      end
 
       jamie = User.create!(jparams: {})
       jamie = User.find(jamie.id)
-      expect(jamie.static_date).to eq(date)
-      expect(jamie.dynamic_date).to eq(dynamic_date)
-    ensure
-      StoreAttribute.configuration.read_unset_returns_default = false
+      expect(jamie.static_date).to be_nil
+      expect(jamie.dynamic_date).to be_nil
+
+      subjamie = subklass.find(jamie.id)
+      expect(subjamie.static_date).to eq(date)
+      expect(subjamie.dynamic_date).to eq(dynamic_date)
+      expect(subjamie.non_default).to eq "no"
+
+      subsubjamie = subsubklass.find(jamie.id)
+      expect(subsubjamie.static_date).to be_nil
+      expect(subsubjamie.dynamic_date).to be_nil
+      expect(subsubjamie.non_default).to be_nil
     end
   end
 

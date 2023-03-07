@@ -47,8 +47,8 @@ describe ActiveRecord::Type::TypedStore do
         expect(subject.deserialize("{}")).to eq({})
       end
 
-      it "with default configured to read_unset_returns_default" do
-        StoreAttribute.configuration.read_unset_returns_default = true
+      it "with owner configured to store_attribute_unset_values_fallback_to_default" do
+        subject.owner = Struct.new(:store_attribute_unset_values_fallback_to_default).new(true)
 
         subject.add_typed_key("val", :integer, default: 1)
 
