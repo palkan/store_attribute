@@ -151,6 +151,5 @@ It is possible to configure `store_attribute` to return the default value even w
 ```ruby
 StoreAttribute.configuration.read_unset_returns_default = true
 user = User.create!(extra: {})
-user.expired_at => #=> 2022-03-19
+user.expired_at #=> 2022-03-19
 ```
-

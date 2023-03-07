@@ -9,6 +9,7 @@ rescue Gem::LoadError
 end
 
 require "active_record"
+require "openssl"
 require "pg"
 require "store_attribute"
 
