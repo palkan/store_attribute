@@ -25,6 +25,8 @@ module ActiveRecord
         new(basetype)
       end
 
+      attr_writer :owner
+
       def initialize(subtype)
         @accessor_types = {}
         @defaults = {}
@@ -47,7 +49,7 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.deserialize(hash[key])
-          elsif StoreAttribute.configuration.read_unset_returns_default && defaults.key?(key)
+          elsif fallback_to_default?(key)
             hash[key] = built_defaults[key]
           end
         end
@@ -127,7 +129,11 @@ module ActiveRecord
         accessor_types.fetch(key.to_s)
       end
 
-      attr_reader :accessor_types, :defaults, :store_accessor
+      def fallback_to_default?(key)
+        owner&.store_attribute_unset_values_fallback_to_default && defaults.key?(key)
+      end
+
+      attr_reader :accessor_types, :defaults, :store_accessor, :owner
     end
   end
 end

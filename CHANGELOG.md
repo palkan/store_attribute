@@ -2,7 +2,23 @@
 
 ## master
 
-- Allow configurable to return default values when attribute key is not present in the serialized value ([@markedmondson][])
+- Add configuration option to return default values when attribute key is not present in the serialized value ([@markedmondson][], [@palkan][]).
+
+Add to the class (preferrable `ApplicationRecord` or some other base class):
+
+```ruby
+class ApplicationRecord < ActiveRecord::Base
+  self.store_attribute_unset_values_fallback_to_default = true
+
+  store_attribute :extra, :color, :string, default: "grey"
+end
+
+user = User.create!(extra: {})
+# without the fallback
+user.color #=> nil
+# with fallback
+user.color #=> "grey"
+```
 
 ## 1.0.2 (2022-07-29)
 

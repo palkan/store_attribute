@@ -10,6 +10,8 @@ module ActiveRecord
       alias_method :_orig_store_without_types, :store
       alias_method :_orig_store_accessor_without_types, :store_accessor
 
+      attr_writer :store_attribute_unset_values_fallback_to_default
+
       # Defines store on this model.
       #
       # +store_name+ The name of the store.
@@ -125,6 +127,17 @@ module ActiveRecord
         _store_local_stored_attribute(store_name, name, type, **options)
       end
 
+      def store_attribute_unset_values_fallback_to_default
+        return @store_attribute_unset_values_fallback_to_default if instance_variable_defined?(:@store_attribute_unset_values_fallback_to_default)
+
+        @store_attribute_unset_values_fallback_to_default =
+          if superclass.respond_to?(:store_attribute_unset_values_fallback_to_default)
+            superclass.store_attribute_unset_values_fallback_to_default
+          else
+            false
+          end
+      end
+
       def _store_local_stored_attribute(store_name, key, cast_type, default: Type::TypedStore::UNDEFINED, **options) # :nodoc:
         cast_type = ActiveRecord::Type.lookup(cast_type, **options) if cast_type.is_a?(Symbol)
         _local_typed_stored_attributes[store_name][key] = [cast_type, default]
@@ -156,10 +169,13 @@ module ActiveRecord
 
         defaultik = Type::TypedStore::Defaultik.new
 
+        owner = self
+
         if use_decorator
           decorate_attribute_type(attr_name, "typed_accessor_for_#{attr_name}") do |subtype|
             subtypes = _local_typed_stored_attributes[attr_name]
             type = Type::TypedStore.create_from_type(subtype)
+            type.owner = owner
             defaultik.type = type
             subtypes.each { |name, (cast_type, default)| type.add_typed_key(name, cast_type, default: default) }
 
@@ -173,6 +189,7 @@ module ActiveRecord
             subtype = _lookup_cast_type(attr_name, was_type, {}) if defined?(_lookup_cast_type)
 
             type = Type::TypedStore.create_from_type(subtype)
+            type.owner = owner
             defaultik.type = type
             subtypes.each { |name, (cast_type, default)| type.add_typed_key(name, cast_type, default: default) }
 
