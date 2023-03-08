@@ -391,12 +391,16 @@ describe StoreAttribute do
     end
 
     it "with defaults for missing attributes when configured" do
-      StoreAttribute.configuration.read_unset_returns_default = true
-      jamie = User.create!(jparams: {})
+      klass = Class.new(User) do
+        self.store_attribute_unset_values_fallback_to_default = true
+
+        # re-assing type object
+        store_accessor :jparams, :version, active: :boolean, salary: :integer
+      end
+
+      jamie = klass.create!(jparams: {})
 
       expect(jamie.changes).to eq({})
-    ensure
-      StoreAttribute.configuration.read_unset_returns_default = false
     end
   end
 
