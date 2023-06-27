@@ -2,7 +2,9 @@
 
 ## master
 
-- Do type lookup after schema load.
+## 1.1.1 (2023-06-27)
+
+- Lookup store attribute types only after schema load.
 
 ## 1.1.0 (2023-03-08) 🌷
 
