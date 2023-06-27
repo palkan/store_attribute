@@ -138,9 +138,6 @@ module ActiveRecord
           end
       end
 
-      def _store_local_stored_attribute(store_name, key, cast_type, default: Type::TypedStore::UNDEFINED, **options) # :nodoc:
-      end
-
       def _local_typed_stored_attributes?
         instance_variable_defined?(:@local_typed_stored_attributes)
       end
