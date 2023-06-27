@@ -2,6 +2,8 @@
 
 ## master
 
+- Do type lookup after schema load.
+
 ## 1.1.0 (2023-03-08) 🌷
 
 - Add configuration option to return default values when attribute key is not present in the serialized value ([@markedmondson][], [@palkan][]).
