@@ -124,7 +124,7 @@ module ActiveRecord
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
         _define_store_attribute(store_name) if !_local_typed_stored_attributes? || _local_typed_stored_attributes[store_name].empty?
-        _store_local_stored_attribute(store_name, name, type, **options)
+        _local_typed_stored_attributes[store_name][name] = [type, options]
       end
 
       def store_attribute_unset_values_fallback_to_default
@@ -139,8 +139,6 @@ module ActiveRecord
       end
 
       def _store_local_stored_attribute(store_name, key, cast_type, default: Type::TypedStore::UNDEFINED, **options) # :nodoc:
-        cast_type = ActiveRecord::Type.lookup(cast_type, **options) if cast_type.is_a?(Symbol)
-        _local_typed_stored_attributes[store_name][key] = [cast_type, default]
       end
 
       def _local_typed_stored_attributes?
@@ -177,7 +175,9 @@ module ActiveRecord
             type = Type::TypedStore.create_from_type(subtype)
             type.owner = owner
             defaultik.type = type
-            subtypes.each { |name, (cast_type, default)| type.add_typed_key(name, cast_type, default: default) }
+            subtypes.each do |name, (cast_type, options)|
+              type.add_typed_key(name, cast_type, **options.symbolize_keys)
+            end
 
             define_default_attribute(attr_name, defaultik.proc, type, from_user: true)
 
@@ -191,7 +191,9 @@ module ActiveRecord
             type = Type::TypedStore.create_from_type(subtype)
             type.owner = owner
             defaultik.type = type
-            subtypes.each { |name, (cast_type, default)| type.add_typed_key(name, cast_type, default: default) }
+            subtypes.each do |name, (cast_type, options)|
+              type.add_typed_key(name, cast_type, **options.symbolize_keys)
+            end
 
             type
           end
