@@ -334,17 +334,17 @@ describe StoreAttribute do
   context "attributes" do
     it "should register all store_attributes as attributes" do
       expect(User.attribute_types).to include(
-        'active' => an_instance_of(ActiveModel::Type::Boolean),
-        'salary' => an_instance_of(ActiveModel::Type::Integer),
-        'birthday' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
-        'static_date' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
-        'dynamic_date' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
-        'empty_date' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
-        'inner_json' => an_instance_of(ActiveRecord::Type::Json),
-        'price' => an_instance_of(MoneyType),
-        'visible' => an_instance_of(ActiveModel::Type::Boolean),
-        'ratio' => an_instance_of(ActiveModel::Type::Integer),
-        'login_at' => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::DateTime),
+        "active" => an_instance_of(ActiveModel::Type::Boolean),
+        "salary" => an_instance_of(ActiveModel::Type::Integer),
+        "birthday" => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        "static_date" => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        "dynamic_date" => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        "empty_date" => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
+        "inner_json" => an_instance_of(ActiveRecord::Type::Json),
+        "price" => an_instance_of(MoneyType),
+        "visible" => an_instance_of(ActiveModel::Type::Boolean),
+        "ratio" => an_instance_of(ActiveModel::Type::Integer),
+        "login_at" => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::DateTime)
       )
     end
   end
@@ -430,7 +430,7 @@ describe StoreAttribute do
       expect(reloaded_user.changed?).to be false
     end
 
-    # https://github.com/palkan/store_attribute/issues/19
+    # https://github.com/palkan/store_as2ttribute/issues/19
     it "without defaults" do
       user = UserWithoutDefaults.new
       user.birthday = "2019-06-26"
@@ -455,6 +455,14 @@ describe StoreAttribute do
       jamie = klass.create!(jparams: {})
 
       expect(jamie.changes).to eq({})
+    end
+
+    it "works if store attribute column is set to nil" do
+      user.save!
+      user.hdata = nil
+
+      expect(user.visible_changed?).to be true
+      expect(user.login_at_changed?).to be true
     end
   end
 

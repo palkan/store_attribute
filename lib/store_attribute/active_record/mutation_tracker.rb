@@ -14,7 +14,7 @@ module StoreAttribute
       prev_store, new_store = orig_changes.map(&:dup)
 
       prev_store&.each do |key, value|
-        if new_store[key] == value
+        if new_store&.dig(key) == value
           prev_store.except!(key)
           new_store&.except!(key)
         end
