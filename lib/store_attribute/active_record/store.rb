@@ -157,16 +157,13 @@ module ActiveRecord
 
       def _define_store_attribute(store_name)
         attr_name = store_name.to_s
-        was_type = attributes_to_define_after_schema_loads[attr_name]&.first
-
-        # For Rails <6.1
-        use_decorator = respond_to?(:decorate_attribute_type) && method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 2
 
         defaultik = Type::TypedStore::Defaultik.new
 
         owner = self
 
-        if use_decorator
+        # For Rails <6.1
+        if respond_to?(:decorate_attribute_type) && method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 2
           decorate_attribute_type(attr_name, "typed_accessor_for_#{attr_name}") do |subtype|
             subtypes = _local_typed_stored_attributes[attr_name]
             type = Type::TypedStore.create_from_type(subtype)
@@ -180,7 +177,25 @@ module ActiveRecord
 
             type
           end
+        # Rails >7.1
+        elsif respond_to?(:decorate_attributes)
+          decorate_attributes([attr_name]) do |_, subtype|
+            subtypes = _local_typed_stored_attributes[attr_name]
+            type = Type::TypedStore.create_from_type(subtype)
+            type.owner = owner
+            defaultik.type = type
+            subtypes.each do |name, (cast_type, options)|
+              type.add_typed_key(name, cast_type, **options.symbolize_keys)
+            end
+
+            type
+          end
+
+          attribute(attr_name, default: defaultik.proc)
+        # Rails >=6.1, <=7.1
         else
+          was_type = attributes_to_define_after_schema_loads[attr_name]&.first
+
           attribute(attr_name, default: defaultik.proc) do |subtype|
             subtypes = _local_typed_stored_attributes[attr_name]
             subtype = _lookup_cast_type(attr_name, was_type, {}) if defined?(_lookup_cast_type)
