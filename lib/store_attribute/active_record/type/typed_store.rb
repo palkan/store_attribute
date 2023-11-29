@@ -118,7 +118,7 @@ module ActiveRecord
       def key_to_cast(val, key)
         return key if val.key?(key)
         return key.to_sym if val.key?(key.to_sym)
-        return key if defaults.key?(key)
+        key if defaults.key?(key)
       end
 
       def typed?(key)
