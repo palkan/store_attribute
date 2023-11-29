@@ -2,6 +2,10 @@
 
 ## master
 
+## 1.2.0 (2023-11-29)
+
+- Support Rails >7.1. ([@palkan][])
+
 - Fix handling of store attributes for not-yet-defined columns. ([@palkan][])
 
 ## 1.1.1 (2023-06-27)
