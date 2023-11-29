@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix handling of store attributes for not-yet-defined columns. ([@palkan][])
+
 ## 1.1.1 (2023-06-27)
 
 - Lookup store attribute types only after schema load.

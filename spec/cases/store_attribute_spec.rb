@@ -555,4 +555,18 @@ describe StoreAttribute do
       expect(dummy_class.new).to be_valid
     end
   end
+
+  context "when column is not present in the table" do
+    let(:dummy_class) do
+      Class.new(ActiveRecord::Base) do
+        self.table_name = "users"
+
+        store_attribute :missing, :cat, :string
+      end
+    end
+
+    specify do
+      expect(dummy_class.new).to be_valid
+    end
+  end
 end

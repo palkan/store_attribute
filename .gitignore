@@ -32,7 +32,7 @@ pkg/
 spec/dummy/log/*.log
 spec/dummy/tmp/
 spec/dummy/.sass-cache
-Gemfile.local
+Gemfile.local*
 Gemfile.lock
 tmp/
 *.override.yml

@@ -30,7 +30,7 @@ module ActiveRecord
       def initialize(subtype)
         @accessor_types = {}
         @defaults = {}
-        @store_accessor = subtype.accessor
+        @subtype = subtype
         super(subtype)
       end
 
@@ -133,7 +133,11 @@ module ActiveRecord
         owner&.store_attribute_unset_values_fallback_to_default && defaults.key?(key)
       end
 
-      attr_reader :accessor_types, :defaults, :store_accessor, :owner
+      def store_accessor
+        subtype.accessor
+      end
+
+      attr_reader :accessor_types, :defaults, :subtype, :owner
     end
   end
 end
