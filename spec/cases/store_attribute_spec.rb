@@ -288,6 +288,20 @@ describe StoreAttribute do
       expect(jamie.saved_change_to_json_active_value).to eq([true, false])
     end
 
+    it "should accept prefix and suffix options when defining accessors through stores directly" do
+      jamie = User.create!
+
+      expect(jamie.details_age_years).to eq(nil)
+
+      jamie.details_age_years = 30
+
+      expect(jamie.details_age_years).to eql(30)
+
+      jamie.save!
+
+      expect(jamie.saved_change_to_details_age_years).to eq([nil, 30])
+    end
+
     it "should preserve prefix/suffix for store_accessor without types" do
       jamie = User.create!(jparams: {version: "x"})
 
