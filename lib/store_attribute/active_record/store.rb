@@ -39,7 +39,7 @@ module ActiveRecord
           end
 
         _orig_store_without_types(store_name, options)
-        store_accessor(store_name, *accessors, **accessor_related_options, **typed_accessors,) if accessors
+        store_accessor(store_name, *accessors, **accessor_related_options, **typed_accessors) if accessors
       end
 
       # Adds additional accessors to an existing store on this model.
