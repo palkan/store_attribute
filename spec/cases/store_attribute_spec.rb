@@ -268,6 +268,17 @@ describe StoreAttribute do
       expect(subsubjamie.dynamic_date).to be_nil
       expect(subsubjamie.non_default).to be_nil
     end
+
+    it "should support defaults without types" do
+      jamie = User.create!
+      expect(jamie.tags).to eq([])
+
+      jamie.tags << "rails"
+
+      jamie.save!
+
+      expect(jamie.reload.tags).to eq(["rails"])
+    end
   end
 
   context "prefix/suffix" do

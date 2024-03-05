@@ -120,7 +120,7 @@ module ActiveRecord
       #   u.settings['ratio'] # => 3
       #
       # For more examples on using types, see documentation for ActiveRecord::Attributes.
-      def store_attribute(store_name, name, type, prefix: nil, suffix: nil, **options)
+      def store_attribute(store_name, name, type = :value, prefix: nil, suffix: nil, **options)
         _orig_store_accessor_without_types(store_name, name.to_s, prefix: prefix, suffix: suffix)
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 

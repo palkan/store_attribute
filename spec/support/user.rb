@@ -40,6 +40,7 @@ class User < ActiveRecord::Base
   store_attribute :jparams, :dynamic_date, :date, default: -> { TODAY_DATE }
   store_attribute :jparams, :empty_date, :date, default: nil
   store_attribute :jparams, :inner_json, :json
+  store_attribute :jparams, :tags, default: []
 
   store_accessor :jparams, active: :boolean, birthday: :date, prefix: "json", suffix: "value"
 

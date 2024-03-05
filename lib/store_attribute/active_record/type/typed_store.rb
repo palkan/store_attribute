@@ -37,6 +37,7 @@ module ActiveRecord
       UNDEFINED = Object.new
 
       def add_typed_key(key, type, default: UNDEFINED, **options)
+        type = ActiveModel::Type::Value.new(**options) if type == :value
         type = ActiveRecord::Type.lookup(type, **options) if type.is_a?(Symbol)
         safe_key = key.to_s
         @accessor_types[safe_key] = type

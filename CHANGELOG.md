@@ -2,6 +2,12 @@
 
 ## master
 
+- Allow specifying only default values w/o types. ([@palkan][])
+
+```ruby
+store_attribute :store, :tags, default: []
+```
+
 - **Ruby >= 2.7 and Rails >= 6.1 are required**. ([@palkan][])
 
 ## 1.2.0 (2023-11-29)
