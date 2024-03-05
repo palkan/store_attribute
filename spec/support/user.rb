@@ -50,4 +50,6 @@ class User < ActiveRecord::Base
 
   store_attribute :hdata, :ratio, :integer, limit: 1
   store_attribute :hdata, :login_at, :datetime
+
+  store :details, accessors: [:age], prefix: true, suffix: :years
 end
