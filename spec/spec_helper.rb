@@ -26,6 +26,8 @@ connection_params =
 if ActiveRecord.respond_to?(:use_yaml_unsafe_load)
   ActiveRecord.use_yaml_unsafe_load = false
   ActiveRecord.yaml_column_permitted_classes << Date
+elsif ActiveRecord::Base.respond_to?(:yaml_column_permitted_classes)
+  ActiveRecord::Base.yaml_column_permitted_classes << Date
 end
 
 ActiveRecord::Base.establish_connection(

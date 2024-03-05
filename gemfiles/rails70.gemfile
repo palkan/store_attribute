@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'rails', '6.0.4.1'
-gem 'psych', '< 4'
+gem 'rails', '~> 7.0.0'
 
 gemspec path: '..'

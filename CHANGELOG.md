@@ -2,6 +2,8 @@
 
 ## master
 
+- **Ruby >= 2.7 and Rails >= 6.1 are required**. ([@palkan][])
+
 ## 1.2.0 (2023-11-29)
 
 - Support Rails >7.1. ([@palkan][])
