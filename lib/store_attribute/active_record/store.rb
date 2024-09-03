@@ -115,7 +115,7 @@ module ActiveRecord
       #   u.ratio # => "3.141592653"
       #
       #   # On the other hand, writing through accessor set correct data within store
-      #   u.ratio = "3.14.1592653"
+      #   u.ratio = "3.141592653"
       #   u.ratio # => 3
       #   u.settings['ratio'] # => 3
       #
@@ -124,8 +124,15 @@ module ActiveRecord
         _orig_store_accessor_without_types(store_name, name.to_s, prefix: prefix, suffix: suffix)
         _define_predicate_method(name, prefix: prefix, suffix: suffix) if type == :boolean
 
-        _define_store_attribute(store_name) if !_local_typed_stored_attributes? || _local_typed_stored_attributes[store_name].empty?
-        _local_typed_stored_attributes[store_name][name] = [type, options]
+        _define_store_attribute(store_name) if !_local_typed_stored_attributes? ||
+          _local_typed_stored_attributes[store_name][:types].empty? ||
+          # Defaults owner has changed, we must decorate the attribute to correctly propagate the defaults
+          (
+            options.key?(:default) && _local_typed_stored_attributes[store_name][:owner] != self
+          )
+
+        _local_typed_stored_attributes[store_name][:owner] = self if options.key?(:default) || !_local_typed_stored_attributes?
+        _local_typed_stored_attributes[store_name][:types][name] = [type, options]
       end
 
       def store_attribute_unset_values_fallback_to_default
@@ -149,10 +156,10 @@ module ActiveRecord
         @local_typed_stored_attributes =
           if superclass.respond_to?(:_local_typed_stored_attributes)
             superclass._local_typed_stored_attributes.dup.tap do |h|
-              h.transform_values!(&:dup)
+              h.transform_values! { |v| {owner: v[:owner], types: v[:types].dup} }
             end
           else
-            Hash.new { |h, k| h[k] = {}.with_indifferent_access }.with_indifferent_access
+            Hash.new { |h, k| h[k] = {types: {}.with_indifferent_access} }.with_indifferent_access
           end
       end
 
@@ -166,7 +173,7 @@ module ActiveRecord
         # For Rails <6.1
         if respond_to?(:decorate_attribute_type) && method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 2
           decorate_attribute_type(attr_name, "typed_accessor_for_#{attr_name}") do |subtype|
-            subtypes = _local_typed_stored_attributes[attr_name]
+            subtypes = _local_typed_stored_attributes[attr_name][:types]
             type = Type::TypedStore.create_from_type(subtype)
             type.owner = owner
             defaultik.type = type
@@ -181,7 +188,7 @@ module ActiveRecord
         # Rails >7.1
         elsif respond_to?(:decorate_attributes)
           decorate_attributes([attr_name]) do |_, subtype|
-            subtypes = _local_typed_stored_attributes[attr_name]
+            subtypes = _local_typed_stored_attributes[attr_name][:types]
             type = Type::TypedStore.create_from_type(subtype)
             type.owner = owner
             defaultik.type = type
@@ -198,7 +205,7 @@ module ActiveRecord
           was_type = attributes_to_define_after_schema_loads[attr_name]&.first
 
           attribute(attr_name, default: defaultik.proc) do |subtype|
-            subtypes = _local_typed_stored_attributes[attr_name]
+            subtypes = _local_typed_stored_attributes[attr_name][:types]
             subtype = _lookup_cast_type(attr_name, was_type, {}) if defined?(_lookup_cast_type)
 
             type = Type::TypedStore.create_from_type(subtype)

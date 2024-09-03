@@ -12,6 +12,7 @@ describe "STI" do
       page = MediaBannerPage.new
       expect(page.heading_level).to eq("2")
       expect(page.media_type).to eq("image")
+      expect(page.media_placement).to eq("right")
 
       expect { page.save! }.to change(Page, :count).by(1)
     end
