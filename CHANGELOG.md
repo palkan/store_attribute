@@ -2,6 +2,10 @@
 
 ## master
 
+## 1.3.0 (2024-09-03) 🗓️
+
+- Fix using defaults when store attributes are inherited from a parent model. ([@palkan][])
+
 - Allow specifying only default values w/o types. ([@palkan][])
 
 ```ruby
