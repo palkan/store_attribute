@@ -31,7 +31,7 @@ module ActiveRecord
         @accessor_types = {}
         @defaults = {}
         @subtype = subtype
-        super(subtype)
+        super
       end
 
       UNDEFINED = Object.new
@@ -62,7 +62,7 @@ module ActiveRecord
       end
 
       def serialize(value)
-        return super(value) unless value.is_a?(Hash)
+        return super unless value.is_a?(Hash)
         typed_casted = {}
         accessor_types.each do |str_key, type|
           key = key_to_cast(value, str_key)
