@@ -279,11 +279,6 @@ describe StoreAttribute do
 
       expect(jamie.reload.tags).to eq(["rails"])
     end
-
-    it "should affect an empty hash initialization" do
-      jamie = User.new(jparams: {})
-      expect(jamie.static_date).to eq(default_date)
-    end
   end
 
   context "prefix/suffix" do
@@ -551,6 +546,17 @@ describe StoreAttribute do
       user = RawUser.find(user.id)
 
       expect(user.jparams.keys).to include("some_flag", "static_date", "dynamic_date")
+
+      # But if fallback is enabled, it must populate defaults
+      subklass = Class.new(klass) do
+        self.store_attribute_unset_values_fallback_to_default = true
+
+        # We must redeclare at least a single attribute to associate it with the new class
+        store_attribute :jparams, :static_date, :date, default: User::DEFAULT_DATE
+      end
+
+      jamie = subklass.new(jparams: {})
+      expect(jamie.static_date).to eq(default_date)
     end
 
     specify "double encoding" do
