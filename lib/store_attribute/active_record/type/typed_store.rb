@@ -80,6 +80,8 @@ module ActiveRecord
         accessor_types.each do |key, type|
           if hash.key?(key)
             hash[key] = type.cast(hash[key])
+          elsif fallback_to_default?(key)
+            hash[key] = built_defaults[key]
           end
         end
         hash
