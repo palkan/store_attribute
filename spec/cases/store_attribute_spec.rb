@@ -279,6 +279,11 @@ describe StoreAttribute do
 
       expect(jamie.reload.tags).to eq(["rails"])
     end
+
+    it "should affect an empty hash initialization" do
+      jamie = User.new(jparams: {})
+      expect(jamie.static_date).to eq(default_date)
+    end
   end
 
   context "prefix/suffix" do
