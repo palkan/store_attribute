@@ -2,6 +2,10 @@
 
 ## master
 
+## 1.3.1 (2024-09-19)
+
+- Populate missing defaults on user input when `store_attribute_unset_values_fallback_to_default` is true. ([@palkan][])
+
 ## 1.3.0 (2024-09-03) 🗓️
 
 - Fix using defaults when store attributes are inherited from a parent model. ([@palkan][])
