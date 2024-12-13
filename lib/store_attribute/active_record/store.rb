@@ -142,7 +142,7 @@ module ActiveRecord
           if superclass.respond_to?(:store_attribute_unset_values_fallback_to_default)
             superclass.store_attribute_unset_values_fallback_to_default
           else
-            false
+            StoreAttribute.store_attribute_unset_values_fallback_to_default
           end
       end
 

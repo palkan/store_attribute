@@ -229,15 +229,15 @@ describe StoreAttribute do
       expect(jamie.changes).to eq({"hdata" => [{}, {"visible" => true}], "jparams" => [{}, {"active" => true}]})
     end
 
-    it "should not return defaults for missing attributes" do
+    it "should return defaults for missing attributes" do
       jamie = User.create!(jparams: {})
-      expect(jamie.static_date).to be_nil
-      expect(jamie.dynamic_date).to be_nil
+      expect(jamie.static_date).to eq(default_date)
+      expect(jamie.dynamic_date).to eq(dynamic_date)
     end
 
-    it "should set defaults for missing attributes when configured", :aggregate_failures do
+    it "should not return defaults for missing attributes when configured", :aggregate_failures do
       klass = Class.new(User) do
-        self.store_attribute_unset_values_fallback_to_default = true
+        self.store_attribute_unset_values_fallback_to_default = false
 
         # We must redeclare at least a single attribute to associate it with the new class
         store_attribute :jparams, :static_date, :date, default: User::DEFAULT_DATE
@@ -248,25 +248,25 @@ describe StoreAttribute do
       end
 
       subsubklass = Class.new(subklass) do
-        self.store_attribute_unset_values_fallback_to_default = false
+        self.store_attribute_unset_values_fallback_to_default = true
 
         store_attribute :jparams, :non_default, :string, default: "no"
       end
 
       jamie = User.create!(jparams: {})
       jamie = User.find(jamie.id)
-      expect(jamie.static_date).to be_nil
-      expect(jamie.dynamic_date).to be_nil
+      expect(jamie.static_date).to eq(default_date)
+      expect(jamie.dynamic_date).to eq(dynamic_date)
 
       subjamie = subklass.find(jamie.id)
-      expect(subjamie.static_date).to eq(date)
-      expect(subjamie.dynamic_date).to eq(dynamic_date)
-      expect(subjamie.non_default).to eq "no"
+      expect(subjamie.static_date).to be_nil
+      expect(subjamie.dynamic_date).to be_nil
+      expect(subjamie.non_default).to be_nil
 
       subsubjamie = subsubklass.find(jamie.id)
-      expect(subsubjamie.static_date).to be_nil
-      expect(subsubjamie.dynamic_date).to be_nil
-      expect(subsubjamie.non_default).to be_nil
+      expect(subsubjamie.static_date).to eq(default_date)
+      expect(subsubjamie.dynamic_date).to eq(dynamic_date)
+      expect(subsubjamie.non_default).to eq "no"
     end
 
     it "should support defaults without types" do
@@ -471,6 +471,8 @@ describe StoreAttribute do
 
     let(:klass) do
       Class.new(User).tap do |kl|
+        kl.store_attribute_unset_values_fallback_to_default = false
+
         kl.store_attribute :jparams, :some_flag, :boolean, default: true
         # Use this attribute to compare the behaviour of store vs regular attributes default values
         kl.attribute :name, :string, default: "john"
@@ -525,7 +527,6 @@ describe StoreAttribute do
       user = klass.find(user.id)
       user.name
 
-      # Default values are only populated for new records
       expect(user).to have_attributes(
         name: nil,
         some_flag: nil

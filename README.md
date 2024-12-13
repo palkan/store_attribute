@@ -146,15 +146,29 @@ another_user.name #=> nil
 another_user.expired_at #=> nil
 ```
 
-It is possible to configure `store_attribute` to return the default value even when the record is persisted and the attribute name is not present. By using the `store_attribute_unset_values_fallback_to_default` class option, default values will be returned for missing keys. For example:
+By default, Store Attribute returns the default value even when the record is persisted but the attribute name is not present:
 
 ```ruby
-class User < ApplicationRecord
-  self.store_attribute_unset_values_fallback_to_default = true
-end
-
 user = User.create!(extra: {})
 user.expired_at #=> 2022-03-19
 ```
 
-**IMPORTANT:** Due to implementation limitations, it's not recommended to toggle the value of `store_attribute_unset_values_fallback_to_default` in sub-classes. We recommend to set this value in base classes (e.g., `ApplicationRecord`).
+You can disable this behaviour by setting the `store_attribute_unset_values_fallback_to_default` class option to `false` in your model:
+
+```ruby
+class User < ApplicationRecord
+  self.store_attribute_unset_values_fallback_to_default = false
+end
+
+user = User.create!(extra: {})
+user.expired_at #=> nil
+```
+
+You can also configure the global default for this option in an initializer or application configuration:
+
+```ruby
+# config/initializers/store_attribute.rb
+# # or
+# config/application.rb
+StoreAttribute.store_attribute_unset_values_fallback_to_default = false
+```

@@ -2,6 +2,16 @@
 
 ## master
 
+## 2.0.0 (2024-12-12)
+
+- **Breaking:** The `store_attribute_unset_values_fallback_to_default` option is now true by default, meaning that the default value will be returned when the attribute key is not present in the serialized value.
+
+For v1.x behavior, set the option to `false` globally as follows:
+
+```ruby
+StoreAttribute.store_attribute_unset_values_fallback_to_default = false
+```
+
 ## 1.3.1 (2024-09-19)
 
 - Populate missing defaults on user input when `store_attribute_unset_values_fallback_to_default` is true. ([@palkan][])
