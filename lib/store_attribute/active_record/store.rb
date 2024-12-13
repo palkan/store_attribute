@@ -200,6 +200,13 @@ module ActiveRecord
               type.add_typed_key(name, cast_type, **options.symbolize_keys)
             end
 
+            # Make sure default attribute uses the correct type, so #changed? works as expected
+            # This is dirty hack that makes Rails <7.2 works similar to Rails >=7.2. Please, upgrade :)
+            if type.defaults.any? && _default_attributes[attr_name] && !_default_attributes[attr_name].type.is_a?(Type::TypedStore)
+              _default_attributes[attr_name] =
+                ActiveModel::Attribute.from_database(attr_name, _default_attributes[attr_name].value.deep_dup, type)
+            end
+
             type
           end
         end

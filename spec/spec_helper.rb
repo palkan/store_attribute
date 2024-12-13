@@ -37,6 +37,8 @@ ActiveRecord::Base.establish_connection(
   }.merge(connection_params)
 )
 
+ActiveRecord::Base.logger = Logger.new($stdout) if ENV["LOG"]
+
 connection = ActiveRecord::Base.connection
 
 unless connection.extension_enabled?("hstore")
@@ -58,4 +60,7 @@ RSpec.configure do |config|
   if config.files_to_run.one?
     config.default_formatter = "doc"
   end
+
+  config.order = :random
+  Kernel.srand config.seed
 end

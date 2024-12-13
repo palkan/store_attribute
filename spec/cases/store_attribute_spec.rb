@@ -2,6 +2,14 @@
 
 require "spec_helper"
 
+using(Module.new do
+  unless Time.now.respond_to?(:to_fs)
+    refine Time do
+      alias_method :to_fs, :to_s
+    end
+  end
+end)
+
 describe StoreAttribute do
   after do
     User.delete_all
@@ -239,7 +247,9 @@ describe StoreAttribute do
         store_attribute :jparams, :non_default, :string, default: "no"
       end
 
-      jamie = User.create!(jparams: {})
+      jamie = User.new(jparams: {})
+      jamie.save!
+
       jamie = User.find(jamie.id)
       expect(jamie.static_date).to eq(default_date)
       expect(jamie.dynamic_date).to eq(dynamic_date)

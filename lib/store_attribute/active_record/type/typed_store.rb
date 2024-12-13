@@ -26,6 +26,7 @@ module ActiveRecord
       end
 
       attr_writer :owner
+      attr_reader :defaults
 
       def initialize(subtype)
         @accessor_types = {}
@@ -140,7 +141,7 @@ module ActiveRecord
         subtype.accessor
       end
 
-      attr_reader :accessor_types, :defaults, :subtype, :owner
+      attr_reader :accessor_types, :subtype, :owner
     end
   end
 end
