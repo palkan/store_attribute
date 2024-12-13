@@ -12,6 +12,8 @@ For v1.x behavior, set the option to `false` globally as follows:
 StoreAttribute.store_attribute_unset_values_fallback_to_default = false
 ```
 
+- Ruby >= 3.0 is required.
+
 ## 1.3.1 (2024-09-19)
 
 - Populate missing defaults on user input when `store_attribute_unset_values_fallback_to_default` is true. ([@palkan][])

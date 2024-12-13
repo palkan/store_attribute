@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.files = Dir.glob("lib/**/*") + %w[README.md LICENSE.txt CHANGELOG.md]
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = ">= 2.7.0"
+  s.required_ruby_version = ">= 3.0.0"
 
   s.metadata = {
     "bug_tracker_uri" => "http://github.com/palkan/store_attribute/issues",

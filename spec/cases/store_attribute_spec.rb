@@ -2,20 +2,6 @@
 
 require "spec_helper"
 
-using(Module.new do
-  unless Time.now.respond_to?(:to_fs)
-    refine Time do
-      alias_method :to_fs, :to_s
-    end
-  end
-
-  unless Psych.respond_to?(:unsafe_load)
-    refine Psych.singleton_class do
-      alias_method :unsafe_load, :load
-    end
-  end
-end)
-
 describe StoreAttribute do
   after do
     User.delete_all

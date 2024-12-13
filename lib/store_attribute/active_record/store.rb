@@ -170,23 +170,8 @@ module ActiveRecord
 
         owner = self
 
-        # For Rails <6.1
-        if respond_to?(:decorate_attribute_type) && method(:decorate_attribute_type).parameters.count { |type, _| type == :req } == 2
-          decorate_attribute_type(attr_name, "typed_accessor_for_#{attr_name}") do |subtype|
-            subtypes = _local_typed_stored_attributes[attr_name][:types]
-            type = Type::TypedStore.create_from_type(subtype)
-            type.owner = owner
-            defaultik.type = type
-            subtypes.each do |name, (cast_type, options)|
-              type.add_typed_key(name, cast_type, **options.symbolize_keys)
-            end
-
-            define_default_attribute(attr_name, defaultik.proc, type, from_user: true)
-
-            type
-          end
         # Rails >7.1
-        elsif respond_to?(:decorate_attributes)
+        if respond_to?(:decorate_attributes)
           decorate_attributes([attr_name]) do |_, subtype|
             subtypes = _local_typed_stored_attributes[attr_name][:types]
             type = Type::TypedStore.create_from_type(subtype)
