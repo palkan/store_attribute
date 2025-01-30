@@ -92,6 +92,10 @@ module ActiveRecord
         self
       end
 
+      def mutable?
+        true
+      end
+
       def write(object, attribute, key, value)
         value = type_for(key).cast(value) if typed?(key)
         store_accessor.write(object, attribute, key, value)
