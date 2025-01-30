@@ -136,6 +136,21 @@ describe StoreAttribute do
       expect(ron.jparams["active"]).to eq true
       expect(ron.jparams["salary"]).to eq 13
     end
+
+    it "typecasts on update" do
+      jamie = User.new(
+        active: false,
+        salary: 3.1999,
+        birthday: "2000-01-01"
+      )
+      expect(jamie).not_to be_active
+      expect(jamie.salary).to eq 3
+
+      jamie.update!(active: "1", salary: "100")
+
+      expect(jamie).to be_active
+      expect(jamie.salary).to eq 100
+    end
   end
 
   context "custom types" do

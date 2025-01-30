@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "logger"
 require "debug" unless ENV["CI"]
 
 begin
