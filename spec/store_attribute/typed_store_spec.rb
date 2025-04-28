@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe ActiveRecord::Type::TypedStore do
-  if ActiveRecord::Coders::JSON.is_a?(Class)
+  if ActiveRecord::Coders::JSON.is_a?(Class) && ActiveRecord::Coders::JSON.public_method_defined?(:load)
     let(:coder) { ActiveRecord::Coders::JSON.new }
   else
     let(:coder) { ActiveRecord::Coders::JSON }
