@@ -101,7 +101,7 @@ module ActiveRecord
         store_accessor.write(object, attribute, key, value)
       end
 
-      delegate :read, :prepare, to: :store_accessor
+      delegate :get, :read, :prepare, to: :store_accessor
 
       def build_defaults
         defaults.transform_values do |val|

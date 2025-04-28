@@ -3,7 +3,12 @@
 require "spec_helper"
 
 describe ActiveRecord::Type::TypedStore do
-  let(:json_type) { ActiveRecord::Type::Serialized.new(ActiveRecord::Type::Text.new, ActiveRecord::Coders::JSON) }
+  if ActiveRecord::Coders::JSON.is_a?(Class)
+    let(:coder) { ActiveRecord::Coders::JSON.new }
+  else
+    let(:coder) { ActiveRecord::Coders::JSON }
+  end
+  let(:json_type) { ActiveRecord::Type::Serialized.new(ActiveRecord::Type::Text.new, coder) }
 
   context "with json store" do
     subject { described_class.new(json_type) }
