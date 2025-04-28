@@ -19,7 +19,7 @@ connection_params =
     {"url" => ENV["DATABASE_URL"]}
   else
     {
-      "host" => ENV["DB_HOST"],
+      "host" => ENV["DB_HOST"] || "localhost",
       "username" => ENV["DB_USER"]
     }
   end
