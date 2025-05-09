@@ -26,6 +26,16 @@ class UserWithoutDefaults < ActiveRecord::Base
   store_attribute :extra, :birthday, :date
 end
 
+class UserWithAttributes < ActiveRecord::Base
+  self.table_name = "users"
+  self.store_attribute_register_attributes = true
+
+  store_accessor :jparams, active: :boolean, birthday: :date, prefix: "json", suffix: "value"
+  store_attribute :jparams, :inner_json, :json
+  store_attribute :hdata, :salary, :integer
+  store :custom, accessors: [:custom_date, price: :money_type]
+end
+
 class User < ActiveRecord::Base
   DEFAULT_DATE = ::Date.new(2019, 7, 17)
   TODAY_DATE = ::Date.today

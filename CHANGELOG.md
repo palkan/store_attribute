@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
   store_attribute :extra, :color, :string, default: "grey"
 end
 
-User.attribute_types.keys.include?('color') #=> true
+User.attribute_types.keys.include?("color") #=> true
 ```
 
 ## 2.0.0 (2024-12-12)
