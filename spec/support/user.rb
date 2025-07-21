@@ -33,6 +33,8 @@ class UserWithAttributes < ActiveRecord::Base
   store_accessor :jparams, active: :boolean, birthday: :date, prefix: "json", suffix: "value"
   store_attribute :jparams, :inner_json, :json
   store_attribute :hdata, :salary, :integer
+  store_attribute :hdata, :hours, ActiveRecord::Type.lookup(:integer)
+
   store :custom, accessors: [:custom_date, price: :money_type]
 end
 

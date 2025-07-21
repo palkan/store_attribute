@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix type lookup issue when registering store_attributes as attributes. ([@n-ivan](https://github.com/n-ivan))
+
 ## 2.0.1 (2025-05-09) 🎇
 
 - Register store_attributes as attributes. ([@rickcsong](https://github.com/rickcsong))
