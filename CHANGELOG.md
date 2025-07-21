@@ -4,6 +4,8 @@
 
 - **Require Ruby 3.2+ and Rails 7.2+.**
 
+- Fix type lookup issue when registering store_attributes as attributes. ([@n-ivan][])
+
 ## 2.0.1 (2025-05-09) 🎇
 
 - Register store_attributes as attributes. ([@rickcsong](https://github.com/rickcsong))
@@ -148,3 +150,4 @@ See [PR#22](https://github.com/palkan/store_attribute/pull/22).
 [@glaszig]: https://github.com/glaszig
 [@ioki-klaus]: https://github.com/ioki-klaus
 [@markedmondson]: https://github.com/markedmondson
+[@n-ivan]: https://github.com/n-ivan

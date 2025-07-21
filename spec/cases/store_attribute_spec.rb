@@ -287,6 +287,7 @@ describe StoreAttribute do
       expect(UserWithAttributes.attribute_types).to include(
         "active" => an_instance_of(ActiveModel::Type::Boolean),
         "salary" => an_instance_of(ActiveModel::Type::Integer),
+        "hours" => an_instance_of(ActiveRecord::Type::Integer),
         "birthday" => an_instance_of(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Date),
         "inner_json" => an_instance_of(ActiveRecord::Type::Json),
         "price" => an_instance_of(MoneyType)
