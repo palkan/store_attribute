@@ -139,8 +139,11 @@ module ActiveRecord
           cast_type =
             if type == :value
               ActiveModel::Type::Value.new(**options.except(:default))
-            else
+            elsif type.is_a?(Symbol)
+              # The type is a symbol, we need to look it up
               ActiveRecord::Type.lookup(type, **options.except(:default))
+            else
+              type
             end
 
           attribute(name, cast_type, **options)
