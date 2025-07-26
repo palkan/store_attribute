@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix attribute synchronization issues when using `store_attribute_register_attributes = true`. ([@mdayaram](https://github.com/mdayaram))
+
 ## 2.0.1 (2025-05-09) 🎇
 
 - Register store_attributes as attributes. ([@rickcsong](https://github.com/rickcsong))

@@ -3,6 +3,7 @@
 require "active_record/store"
 require "store_attribute/active_record/type/typed_store"
 require "store_attribute/active_record/mutation_tracker"
+require "store_attribute/active_record/store/attributes_sync"
 
 module ActiveRecord
   module Store
@@ -136,6 +137,8 @@ module ActiveRecord
         _local_typed_stored_attributes[store_name][:types][name] = [type, options]
 
         if store_attribute_register_attributes
+          _ensure_attributes_sync_module_included
+
           cast_type =
             if type == :value
               ActiveModel::Type::Value.new(**options.except(:default))
@@ -144,6 +147,9 @@ module ActiveRecord
             end
 
           attribute(name, cast_type, **options)
+
+          # Define store-aware accessors for registered attributes
+          _define_store_attribute_accessors(store_name, name)
         end
       end
 
@@ -261,6 +267,26 @@ module ActiveRecord
           define_method("#{name}?") do
             send(name) == true
           end
+        end
+      end
+
+      def _ensure_attributes_sync_module_included
+        unless included_modules.include?(StoreAttribute::ActiveRecord::Store::AttributesSync)
+          include StoreAttribute::ActiveRecord::Store::AttributesSync
+        end
+      end
+
+      def _define_store_attribute_accessors(store_name, name)
+        # Override getter to read from store
+        define_method(name) do
+          read_store_attribute(store_name, name)
+        end
+
+        # Override setter to write to both store and registered attribute
+        define_method("#{name}=") do |value|
+          write_store_attribute(store_name, name, value)
+          # Also update the registered attribute so it appears in the attributes hash
+          @attributes.write_from_user(name.to_s, value) if self.class.store_attribute_register_attributes
         end
       end
     end

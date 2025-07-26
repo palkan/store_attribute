@@ -173,6 +173,56 @@ You can also configure the global default for this option in an initializer or a
 StoreAttribute.store_attribute_unset_values_fallback_to_default = false
 ```
 
+### Registering Store Attributes
+
+By default, store attributes are not registered in the Rails attribute system. This provides better performance and compatibility with the store behavior. However, you can enable attribute registration by setting `store_attribute_register_attributes` to `true`:
+
+```ruby
+class User < ApplicationRecord
+  self.store_attribute_register_attributes = true
+ 
+  store_attribute :settings, :age, :integer
+  store_attribute :settings, :active, :boolean
+end
+```
+
+When enabled, store attributes will:
+- Appear in the `attributes` hash
+- Work with Rails' attribute API methods (`*_before_type_cast`, `*_came_from_user?`, etc.)
+- Integrate better with forms and serialization
+
+However, there are some limitations when using registered attributes:
+
+#### Known Limitations
+
+1. **Alias Attributes**: Setting values through aliased attributes doesn't update the store:
+
+```ruby
+class User < ActiveRecord::Base
+  self.store_attribute_register_attributes = true
+  store_attribute :settings, :age, :integer
+  alias_attribute :years_old, :age
+end
+
+user.age = 30        # ✓ Works - updates both attribute and store
+user.years_old = 35  # ✗ Fails - only updates attribute, not store
+```
+
+2. **Nil vs Unset Distinction**: Setting an attribute to `nil` doesn't always add the key to the store:
+
+```ruby
+user = User.new
+user.bio = nil
+
+# Expected behavior (how stores normally work):
+user.profile  # => {"bio" => nil}
+
+# Actual behavior with registered attributes:
+user.profile  # => {}
+```
+
+These limitations stem from architectural differences between Rails' attribute system and store hashes. If your use case requires heavy use of alias attributes or distinguishing between nil and unset values, consider using `store_attribute_register_attributes = false` (the default).
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/palkan/store_attribute](https://github.com/palkan/store_attribute).

@@ -341,6 +341,12 @@ describe StoreAttribute do
         "price" => an_instance_of(MoneyType)
       )
     end
+
+    it "should return the value of store_attributes in .attributes" do
+      user = UserWithAttributes.create!(salary: 1000)
+      expect(user.salary).to eq(1000)
+      expect(user.attributes["salary"]).to eq(1000)
+    end
   end
 
   context "dirty tracking" do
@@ -635,6 +641,103 @@ describe StoreAttribute do
 
     specify do
       expect(dummy_class.new).to be_valid
+    end
+  end
+
+  context "with registered attributes and numericality validation" do
+    let(:model_class) do
+      Class.new(ActiveRecord::Base) do
+        def self.name
+          "TestModelWithNumValidation"
+        end
+
+        self.table_name = "users"
+        self.store_attribute_register_attributes = true
+
+        store_attribute :jparams, :num, :integer, default: 10
+
+        validates :num, numericality: {only_integer: true, greater_than_or_equal_to: 0}
+      end
+    end
+
+    it "validates using actual value, not default, when attribute is set to invalid value" do
+      record = model_class.new
+      expect(record.num).to eq(10)
+      expect(record).to be_valid
+
+      record.num = -1
+      expect(record.num).to eq(-1)
+      expect(record).not_to be_valid
+      expect(record.errors[:num]).to include("must be greater than or equal to 0")
+    end
+
+    it "validates correctly after saving and reloading with invalid value" do
+      record = model_class.new
+      record.num = -1
+      expect(record).not_to be_valid
+
+      # Force save despite validation to test reload behavior
+      record.save!(validate: false)
+
+      reloaded = model_class.find(record.id)
+      expect(reloaded.num).to eq(-1)
+      expect(reloaded).not_to be_valid
+      expect(reloaded.errors[:num]).to include("must be greater than or equal to 0")
+    end
+
+    it "still uses default value for new records when no value is set" do
+      record = model_class.new
+      expect(record.num).to eq(10)
+      expect(record).to be_valid
+    end
+
+    it "validates correctly with valid non-default values" do
+      record = model_class.new
+      record.num = 5
+      expect(record.num).to eq(5)
+      expect(record).to be_valid
+    end
+
+    it "handles validation with string input that should be type cast" do
+      record = model_class.new
+      record.num = "-5"
+      expect(record.num).to eq(-5)
+      expect(record).not_to be_valid
+      expect(record.errors[:num]).to include("must be greater than or equal to 0")
+    end
+
+    it "preserves default behavior when store is set explicitly during creation" do
+      record = model_class.new(jparams: {num: -3})
+      expect(record.num).to eq(-3)
+      expect(record).not_to be_valid
+      expect(record.errors[:num]).to include("must be greater than or equal to 0")
+    end
+
+    context "with other validation types" do
+      let(:model_with_presence) do
+        Class.new(ActiveRecord::Base) do
+          def self.name
+            "TestModelWithPresenceValidation"
+          end
+
+          self.table_name = "users"
+          self.store_attribute_register_attributes = true
+
+          store_attribute :jparams, :required_field, :string, default: "default_value"
+
+          validates :required_field, presence: true
+        end
+      end
+
+      it "still works correctly with presence validation" do
+        record = model_with_presence.new
+        expect(record.required_field).to eq("default_value")
+        expect(record).to be_valid
+
+        record.required_field = ""
+        expect(record).not_to be_valid
+        expect(record.errors[:required_field]).to include("can't be blank")
+      end
     end
   end
 end
