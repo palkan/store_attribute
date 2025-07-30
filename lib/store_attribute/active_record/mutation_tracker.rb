@@ -5,7 +5,7 @@ module StoreAttribute
   module MutationTracker
     def change_to_attribute(attr_name)
       return super unless attributes.is_a?(ActiveModel::AttributeSet)
-      return super unless attributes[attr_name].type.is_a?(ActiveRecord::Type::TypedStore)
+      return super unless attributes[attr_name].type.is_a?(::ActiveRecord::Type::TypedStore)
 
       orig_changes = super
 
