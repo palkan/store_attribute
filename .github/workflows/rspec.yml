@@ -15,52 +15,26 @@ jobs:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
       CI: true
       RAILS_ENV: test
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.3"]
-        postgres: ["17"]
+        ruby: ["3.4"]
         gemfile: [
           "gemfiles/rails8.gemfile"
         ]
         include:
-        - ruby: "3.0"
-          postgres: "15"
-          gemfile: "gemfiles/rails6.gemfile"
         - ruby: "3.2"
-          postgres: "15"
           gemfile: "gemfiles/rails7.gemfile"
         - ruby: "3.3"
-          postgres: "15"
+          gemfile: "gemfiles/rails7.gemfile"
+        - ruby: "3.4"
           gemfile: "gemfiles/railsmaster.gemfile"
-        - ruby: "3.1"
-          postgres: "14"
-          gemfile: "gemfiles/rails70.gemfile"
-    services:
-      postgres:
-        image: postgres:${{ matrix.postgres }}
-        ports: ["5432:5432"]
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
-    - uses: actions/checkout@v2
-    - name: Install system deps
-      run: |
-        sudo apt-get update
-        sudo apt-get -yqq install libpq-dev
+    - uses: actions/checkout@v6
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
-    - name: Create DB
-      run: |
-        env PGPASSWORD=postgres createdb -h localhost -U postgres store_attribute_test
     - name: Run RSpec
       run: |
         bundle exec rspec -f d --force-color

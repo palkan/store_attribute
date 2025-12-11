@@ -2,6 +2,8 @@
 
 ## master
 
+- **Require Ruby 3.2+ and Rails 7.2+.**
+
 ## 2.0.1 (2025-05-09) 🎇
 
 - Register store_attributes as attributes. ([@rickcsong](https://github.com/rickcsong))

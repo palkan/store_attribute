@@ -13,7 +13,7 @@ Originally extracted from not merged PR to Rails: [rails/rails#18942](https://gi
 In your Gemfile:
 
 ```ruby
-# for Rails 6.1+ (7 is supported)
+# for Rails 6.1+
 gem "store_attribute", "~> 1.0"
 
 # for Rails 5+ (6 is supported)
