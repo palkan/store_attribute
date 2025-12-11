@@ -1,8 +1,13 @@
-require:
-  - standard/cop/block_single_line_braces
+inherit_mode:
+  merge:
+    - Exclude
+
+plugins:
+  - standard-custom
 
 inherit_gem:
   standard: config/base.yml
+  standard-custom: config/base.yml
 
 inherit_from:
   - .rubocop/rubocop_rspec.yml
@@ -17,7 +22,7 @@ AllCops:
   DisplayCopNames: true
   SuggestExtensions: false
   NewCops: disable
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
 
 Standard/BlockSingleLineBraces:
   Enabled: false
