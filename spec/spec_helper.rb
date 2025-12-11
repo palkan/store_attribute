@@ -1,28 +1,13 @@
 # frozen_string_literal: true
 
-require "logger"
-require "debug" unless ENV["CI"]
-
 begin
-  gem "psych", "< 4"
-  require "psych"
-rescue Gem::LoadError
+  require "debug" unless ENV["CI"]
+rescue LoadError
 end
 
 require "active_record"
-require "openssl"
-require "pg"
+require "pglite"
 require "store_attribute"
-
-connection_params =
-  if ENV.key?("DATABASE_URL")
-    {"url" => ENV["DATABASE_URL"]}
-  else
-    {
-      "host" => ENV["DB_HOST"] || "localhost",
-      "username" => ENV["DB_USER"]
-    }
-  end
 
 if ActiveRecord.respond_to?(:use_yaml_unsafe_load)
   ActiveRecord.use_yaml_unsafe_load = false
@@ -31,23 +16,16 @@ elsif ActiveRecord::Base.respond_to?(:yaml_column_permitted_classes)
   ActiveRecord::Base.yaml_column_permitted_classes << Date
 end
 
+PGlite.install!(File.expand_path(File.join(__dir__, "../tmp/pglite")))
+
 ActiveRecord::Base.establish_connection(
   {
-    "adapter" => "postgresql",
+    "adapter" => "pglite",
     "database" => "store_attribute_test"
-  }.merge(connection_params)
+  }
 )
 
 ActiveRecord::Base.logger = Logger.new($stdout) if ENV["LOG"]
-
-connection = ActiveRecord::Base.connection
-
-unless connection.extension_enabled?("hstore")
-  connection.enable_extension "hstore"
-  connection.commit_db_transaction
-end
-
-connection.reconnect!
 
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].sort.each { |f| require f }
 

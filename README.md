@@ -4,9 +4,9 @@
 
 ## Store Attribute
 
-ActiveRecord extension which adds typecasting to store accessors.
+Active Record extension which adds type casting support to store accessors.
 
-Originally extracted from not merged PR to Rails: [rails/rails#18942](https://github.com/rails/rails/pull/18942).
+Originally extracted from the (unmerged) PR to Ruby on Rails: [rails/rails#18942](https://github.com/rails/rails/pull/18942).
 
 ### Install
 
@@ -176,13 +176,6 @@ StoreAttribute.store_attribute_unset_values_fallback_to_default = false
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/palkan/store_attribute](https://github.com/palkan/store_attribute).
-
-For local development, you'll need PostgreSQL up and running. You can either install it on your host machine or run via Docker as follows:
-
-```bash
-docker run --name store_attribute_postgres -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_USER=$USER -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
-docker exec -it store_attribute_postgres createdb -U $USER store_attribute_test
-```
 
 ## License
 

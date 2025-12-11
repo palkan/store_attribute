@@ -20,55 +20,6 @@ describe StoreAttribute do
   let(:dynamic_date) { User::TODAY_DATE }
   let(:time) { DateTime.new(2015, 2, 14, 17, 0, 0) }
   let(:time_str) { "2015-02-14 17:00" }
-  let(:time_str_utc) { "2015-02-14 17:00:00 UTC" }
-
-  context "hstore" do
-    it "typecasts on build" do
-      user = User.new(visible: "t", login_at: time_str)
-      expect(user.visible).to eq true
-      expect(user).to be_visible
-      expect(user.login_at).to eq time
-    end
-
-    it "typecasts on reload" do
-      user = User.new(visible: "t", login_at: time_str)
-      user.save!
-      user = User.find(user.id)
-
-      expect(user.visible).to eq true
-      expect(user).to be_visible
-      expect(user.login_at).to eq time
-    end
-
-    it "works with accessors" do
-      user = User.new
-      user.visible = false
-      user.login_at = time_str
-      user.save!
-
-      user = User.find(user.id)
-
-      expect(user.visible).to be false
-      expect(user).not_to be_visible
-      expect(user.login_at).to eq time
-
-      ron = RawUser.find(user.id)
-      expect(ron.hdata["visible"]).to eq "false"
-      expect(ron.hdata["login_at"]).to eq time_str_utc
-    end
-
-    it "handles options" do
-      expect { User.create!(ratio: 1024) }.to raise_error(RangeError)
-    end
-
-    it "YAML roundtrip" do
-      user = User.create!(visible: "0", login_at: time_str)
-      dumped = YAML.unsafe_load(YAML.dump(user))
-
-      expect(dumped.visible).to be false
-      expect(dumped.login_at).to eq time
-    end
-  end
 
   context "jsonb" do
     it "typecasts on build" do
@@ -235,7 +186,7 @@ describe StoreAttribute do
       jamie.static_date
       jamie.visible = true
       jamie.active = true
-      expect(jamie.changes).to eq({"hdata" => [{}, {"visible" => true}], "jparams" => [{}, {"active" => true}]})
+      expect(jamie.changes).to eq({"jdata" => [{}, {"visible" => true}], "jparams" => [{}, {"active" => true}]})
     end
 
     it "should return defaults for missing attributes" do
@@ -367,7 +318,7 @@ describe StoreAttribute do
       expect(user.login_at_change[1].to_i).to eq now.to_i
       expect(user.login_at_was).to eq nil
 
-      expect(user.changes["hdata"]).to eq [{}, {"login_at" => now.to_fs(:db), "visible" => false}]
+      expect(user.changes["jdata"]).to eq [{}, {"login_at" => now.to_fs(:db), "visible" => false}]
     end
 
     it "should report saved changes" do
@@ -453,7 +404,7 @@ describe StoreAttribute do
 
     it "works if store attribute column is set to nil" do
       user.save!
-      user.hdata = nil
+      user.jdata = nil
 
       expect(user.visible_changed?).to be true
       expect(user.login_at_changed?).to be true

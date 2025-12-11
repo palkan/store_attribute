@@ -12,7 +12,7 @@ connection.transaction do
     t.string :statdate
     t.jsonb :jparams, default: {}, null: false
     t.text :custom
-    t.hstore :hdata, default: {}, null: false
+    t.jsonb :jdata, default: {}, null: false
   end
 end
 
@@ -32,7 +32,7 @@ class UserWithAttributes < ActiveRecord::Base
 
   store_accessor :jparams, active: :boolean, birthday: :date, prefix: "json", suffix: "value"
   store_attribute :jparams, :inner_json, :json
-  store_attribute :hdata, :salary, :integer
+  store_attribute :jdata, :salary, :integer
   store :custom, accessors: [:custom_date, price: :money_type]
 end
 
@@ -57,10 +57,10 @@ class User < ActiveRecord::Base
   store :custom, accessors: [:custom_date, price: :money_type]
   after_initialize { self.custom_date = TODAY_DATE }
 
-  store_accessor :hdata, visible: :boolean
+  store_accessor :jdata, visible: :boolean
 
-  store_attribute :hdata, :ratio, :integer, limit: 1
-  store_attribute :hdata, :login_at, :datetime
+  store_attribute :jdata, :ratio, :integer, limit: 1
+  store_attribute :jdata, :login_at, :datetime
 
   store :details, accessors: [:age], prefix: true, suffix: :years
 end
