@@ -2,6 +2,10 @@
 
 ## master
 
+## 2.1.1 (2026-01-13)
+
+- Fix defining store attributes after schema loading. ([@palkan][])
+
 ## 2.1.0 (2026-01-12)
 
 - **Require Ruby 3.2+ and Rails 7.2+.**
