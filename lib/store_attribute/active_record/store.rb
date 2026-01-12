@@ -140,7 +140,6 @@ module ActiveRecord
             if type == :value
               ActiveModel::Type::Value.new(**options.except(:default))
             elsif type.is_a?(Symbol)
-              # The type is a symbol, we need to look it up
               ActiveRecord::Type.lookup(type, **options.except(:default))
             else
               type

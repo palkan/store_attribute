@@ -2,6 +2,8 @@
 
 ## master
 
+## 2.1.0 (2026-01-12)
+
 - **Require Ruby 3.2+ and Rails 7.2+.**
 
 - Fix type lookup issue when registering store_attributes as attributes. ([@n-ivan][])
