@@ -135,6 +135,11 @@ module ActiveRecord
         _local_typed_stored_attributes[store_name][:owner] = self if options.key?(:default) || !_local_typed_stored_attributes?
         _local_typed_stored_attributes[store_name][:types][name] = [type, options]
 
+        # In case #decorate_attribute has already been invoked, add new type information right away
+        if (dtype = _local_typed_stored_attributes[store_name][:decorated_type])
+          dtype.add_typed_key(name, type, **options.symbolize_keys)
+        end
+
         if store_attribute_register_attributes
           cast_type =
             if type == :value
@@ -205,6 +210,8 @@ module ActiveRecord
             subtypes.each do |name, (cast_type, options)|
               type.add_typed_key(name, cast_type, **options.symbolize_keys)
             end
+
+            _local_typed_stored_attributes[attr_name][:decorated_type] = type
 
             type
           end
