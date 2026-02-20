@@ -127,12 +127,11 @@ module ActiveRecord
 
         _define_store_attribute(store_name) if !_local_typed_stored_attributes? ||
           _local_typed_stored_attributes[store_name][:types].empty? ||
-          # Defaults owner has changed, we must decorate the attribute to correctly propagate the defaults
-          (
-            options.key?(:default) && _local_typed_stored_attributes[store_name][:owner] != self
-          )
+          # Owner has changed (e.g., subclass adding to inherited store),
+          # we must re-decorate the attribute to correctly set up type casting and defaults
+          _local_typed_stored_attributes[store_name][:owner] != self
 
-        _local_typed_stored_attributes[store_name][:owner] = self if options.key?(:default) || !_local_typed_stored_attributes?
+        _local_typed_stored_attributes[store_name][:owner] = self if !_local_typed_stored_attributes? || _local_typed_stored_attributes[store_name][:owner] != self
         _local_typed_stored_attributes[store_name][:types][name] = [type, options]
 
         # In case #decorate_attribute has already been invoked, add new type information right away
