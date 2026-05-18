@@ -241,6 +241,19 @@ describe StoreAttribute do
 
       expect(jamie.reload.tags).to eq(["rails"])
     end
+
+    it "casts a raw default through the declared type" do
+      klass = Class.new(User) do
+        store_attribute :jparams, :due_at, :date, default: "2026-05-25"
+        store_attribute :jparams, :renews_at, :date, default: -> { "2026-06-01" }
+      end
+
+      jamie = klass.new(jparams: {})
+      expect(jamie.due_at).to eq(Date.new(2026, 5, 25))
+      expect(jamie.due_at).to be_a(Date)
+      expect(jamie.renews_at).to eq(Date.new(2026, 6, 1))
+      expect(jamie.renews_at).to be_a(Date)
+    end
   end
 
   context "prefix/suffix" do
