@@ -25,6 +25,61 @@ describe ActiveRecord::Type::TypedStore do
         date = ::Date.new(2016, 6, 22)
         expect(subject.cast(date: "2016-06-22")).to eq("date" => date)
       end
+
+      it "with no default" do
+        subject.add_typed_key("val", :integer)
+
+        expect(subject.cast({})).to eq({})
+      end
+
+      it "with default" do
+        subject.add_typed_key("val", :integer, default: 1)
+
+        expect(subject.cast({})).to eq({})
+      end
+
+      context "with owner configured to store_attribute_unset_values_fallback_to_default" do
+        before do
+          subject.owner = Struct.new(:store_attribute_unset_values_fallback_to_default).new(true)
+        end
+
+        it "casts a typed default" do
+          subject.add_typed_key("val", :integer, default: 1)
+
+          expect(subject.cast({})).to eq("val" => 1)
+        end
+
+        it "casts a string default to the declared type" do
+          date = ::Date.new(2016, 6, 22)
+          subject.add_typed_key("date", :date, default: "2016-06-22")
+
+          result = subject.cast({})
+          expect(result["date"]).to eq(date)
+          expect(result["date"]).to be_a(::Date)
+        end
+
+        it "casts a proc default to the declared type" do
+          date = ::Date.new(2016, 6, 22)
+          subject.add_typed_key("date", :date, default: -> { "2016-06-22" })
+
+          result = subject.cast({})
+          expect(result["date"]).to eq(date)
+          expect(result["date"]).to be_a(::Date)
+        end
+
+        it "leaves an already-typed default unchanged" do
+          date = ::Date.new(2016, 6, 22)
+          subject.add_typed_key("date", :date, default: date)
+
+          expect(subject.cast({})).to eq("date" => date)
+        end
+
+        it "preserves nil defaults" do
+          subject.add_typed_key("val", :integer, default: nil)
+
+          expect(subject.cast({})).to eq("val" => nil)
+        end
+      end
     end
 
     describe "#deserialize" do
@@ -52,12 +107,47 @@ describe ActiveRecord::Type::TypedStore do
         expect(subject.deserialize("{}")).to eq({})
       end
 
-      it "with owner configured to store_attribute_unset_values_fallback_to_default" do
-        subject.owner = Struct.new(:store_attribute_unset_values_fallback_to_default).new(true)
+      context "with owner configured to store_attribute_unset_values_fallback_to_default" do
+        before do
+          subject.owner = Struct.new(:store_attribute_unset_values_fallback_to_default).new(true)
+        end
 
-        subject.add_typed_key("val", :integer, default: 1)
+        it "deserializes a typed default" do
+          subject.add_typed_key("val", :integer, default: 1)
 
-        expect(subject.deserialize("{}")).to eq("val" => 1)
+          expect(subject.deserialize("{}")).to eq("val" => 1)
+        end
+
+        it "deserializes a string default to the declared type" do
+          date = ::Date.new(2016, 6, 22)
+          subject.add_typed_key("date", :date, default: "2016-06-22")
+
+          result = subject.deserialize("{}")
+          expect(result["date"]).to eq(date)
+          expect(result["date"]).to be_a(::Date)
+        end
+
+        it "deserializes a proc default to the declared type" do
+          date = ::Date.new(2016, 6, 22)
+          subject.add_typed_key("date", :date, default: -> { "2016-06-22" })
+
+          result = subject.deserialize("{}")
+          expect(result["date"]).to eq(date)
+          expect(result["date"]).to be_a(::Date)
+        end
+
+        it "leaves an already-typed default unchanged" do
+          date = ::Date.new(2016, 6, 22)
+          subject.add_typed_key("date", :date, default: date)
+
+          expect(subject.deserialize("{}")).to eq("date" => date)
+        end
+
+        it "preserves nil defaults" do
+          subject.add_typed_key("val", :integer, default: nil)
+
+          expect(subject.deserialize("{}")).to eq("val" => nil)
+        end
       end
     end
 
