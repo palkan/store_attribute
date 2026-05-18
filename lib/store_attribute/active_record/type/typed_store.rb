@@ -52,7 +52,7 @@ module ActiveRecord
           if hash.key?(key)
             hash[key] = type.deserialize(hash[key])
           elsif fallback_to_default?(key)
-            hash[key] = built_defaults[key]
+            hash[key] = type.deserialize(built_defaults[key])
           end
         end
         hash
@@ -82,7 +82,7 @@ module ActiveRecord
           if hash.key?(key)
             hash[key] = type.cast(hash[key])
           elsif fallback_to_default?(key)
-            hash[key] = built_defaults[key]
+            hash[key] = type.cast(built_defaults[key])
           end
         end
         hash
