@@ -2,6 +2,8 @@
 
 ## master
 
+- Cast values coming from attribute defaults ([@honeyryderchuck][]).
+
 ## 2.1.1 (2026-01-13)
 
 - Fix defining store attributes after schema loading. ([@palkan][])
