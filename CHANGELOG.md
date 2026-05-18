@@ -6,6 +6,8 @@
 
 - Fix Rails 8.2 compatibility (named store accessors module). ([@palkan][])
 
+- Cast values coming from attribute defaults ([@honeyryderchuck][]).
+
 ## 2.1.1 (2026-01-13)
 
 - Fix defining store attributes after schema loading. ([@palkan][])
