@@ -2,6 +2,8 @@
 
 ## master
 
+- Defer patching Active Record via `ActiveSupport.on_load(:active_record)` so requiring the gem no longer force-loads the JSON column type before app initializers run. ([@MattyMc](https://github.com/MattyMc))
+
 ## 2.1.1 (2026-01-13)
 
 - Fix defining store attributes after schema loading. ([@palkan][])
