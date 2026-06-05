@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix test suite compatibility with Rails main (pglite shims). ([@MattyMc](https://github.com/MattyMc))
+
 ## 2.1.1 (2026-01-13)
 
 - Fix defining store attributes after schema loading. ([@palkan][])
