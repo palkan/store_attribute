@@ -9,6 +9,8 @@ require "active_record"
 require "pglite"
 require "store_attribute"
 
+require "date"
+
 if ActiveRecord.respond_to?(:use_yaml_unsafe_load)
   ActiveRecord.use_yaml_unsafe_load = false
   ActiveRecord.yaml_column_permitted_classes << Date
