@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "activerecord", ">= 7.2"
 
-  s.add_development_dependency "pglite", ">= 0.0.5"
+  s.add_development_dependency "pglite", ">= 0.2.0"
   s.add_development_dependency "rake", ">= 13.0"
   s.add_development_dependency "rspec", ">= 3.5.0"
 end
