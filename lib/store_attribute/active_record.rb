@@ -1,3 +1,7 @@
 # frozen_string_literal: true
 
-require "store_attribute/active_record/store"
+require "active_support/lazy_load_hooks"
+
+ActiveSupport.on_load(:active_record) do
+  require "store_attribute/active_record/store"
+end
