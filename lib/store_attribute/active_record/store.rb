@@ -272,6 +272,19 @@ module ActiveRecord
           end
         end
       end
+
+      unless method_defined?(:_store_accessors_module)
+        # Rails 8.2 introduced named accessors module
+        def _store_accessors_module
+          if const_defined?(:GeneratedStoreMethods, false)
+            const_get(:GeneratedStoreMethods, false)
+          else
+            mod = const_set(:GeneratedStoreMethods, Module.new)
+            include mod # rubocop:disable Layout/EmptyLinesAfterModuleInclusion
+            mod
+          end
+        end
+      end
     end
   end
 end
