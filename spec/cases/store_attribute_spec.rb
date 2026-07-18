@@ -102,6 +102,32 @@ describe StoreAttribute do
       expect(jamie).to be_active
       expect(jamie.salary).to eq 100
     end
+
+    it "typecasts inherited typed store attributes without defaults on reload" do
+      subclass = Class.new(User) do
+        store_attribute :jparams, :amount, :decimal, precision: 15, scale: 2
+      end
+
+      record = subclass.create!(jparams: {"amount" => "12345.67"})
+      record.reload
+
+      expect(record.amount).to eq BigDecimal("12345.67")
+      expect(record.jparams["amount"]).to eq BigDecimal("12345.67")
+    end
+
+    it "typecasts typed store attributes without defaults on reload" do
+      klass = Class.new(ActiveRecord::Base) do
+        self.table_name = "users"
+
+        store_attribute :jparams, :amount, :decimal, precision: 15, scale: 2
+      end
+
+      record = klass.create!(jparams: {"amount" => "12345.67"})
+      record.reload
+
+      expect(record.amount).to eq BigDecimal("12345.67")
+      expect(record.jparams["amount"]).to eq BigDecimal("12345.67")
+    end
   end
 
   context "custom types" do
