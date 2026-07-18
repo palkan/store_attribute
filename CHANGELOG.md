@@ -2,6 +2,10 @@
 
 ## master
 
+## 2.2.0 (2026-07-17)
+
+- Add regression coverage for store key dirty-tracking methods (`saved_change_to_KEY?`, `KEY_changed?`, `KEY_was`, `KEY_change`, `KEY_before_last_save`), which rely on `TypedStore` delegating `#get` to the underlying store accessor (fixed in 2.0.1). ([@palkan][])
+
 - Defer patching Active Record via `ActiveSupport.on_load(:active_record)` so requiring the gem no longer force-loads the JSON column type before app initializers run. ([@MattyMc](https://github.com/MattyMc))
 
 - Fix Rails 8.2 compatibility (named store accessors module). ([@palkan][])
