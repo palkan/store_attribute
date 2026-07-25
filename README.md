@@ -8,6 +8,10 @@ Active Record extension which adds type casting support to store accessors.
 
 Originally extracted from the (unmerged) PR to Ruby on Rails: [rails/rails#18942](https://github.com/rails/rails/pull/18942).
 
+<br/>
+
+<img src="https://cdn.evilmartians.com/badges/logo-no-label.svg" alt="Evil Martians logo" width="22" height="16" /> <b>Store Attribute</b> is built by <b><a href="https://evilmartians.com/">Evil Martians</a></b>, an American design and engineering consultancy for <b>developer tools, AI, and cybersecurity startups</b>.
+
 ### Install
 
 In your Gemfile:
