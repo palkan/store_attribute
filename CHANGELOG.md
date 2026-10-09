@@ -2,6 +2,8 @@
 
 ## master
 
+- Fix defaults not being applied when reading a store attribute whose column is `NULL` (Active Record 8.1 no longer re-reads the attribute after `prepare` assigns the empty store).
+
 ## 2.2.0 (2026-07-17)
 
 - Add regression coverage for store key dirty-tracking methods (`saved_change_to_KEY?`, `KEY_changed?`, `KEY_was`, `KEY_change`, `KEY_before_last_save`), which rely on `TypedStore` delegating `#get` to the underlying store accessor (fixed in 2.0.1). ([@palkan][])
