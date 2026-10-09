@@ -280,6 +280,64 @@ describe StoreAttribute do
       expect(jamie.renews_at).to eq(Date.new(2026, 6, 1))
       expect(jamie.renews_at).to be_a(Date)
     end
+
+    it "returns defaults when the store column is NULL in the database" do
+      klass = Class.new(User) do
+        store_attribute :extra, :plan, :string, default: "free"
+        store_attribute :extra, :renews_at, :date, default: User::DEFAULT_DATE
+      end
+
+      jamie = User.create!
+      RawUser.where(id: jamie.id).update_all(extra: nil)
+
+      loaded = klass.find(jamie.id)
+      expect(loaded.extra).to be_nil
+      expect(loaded.plan).to eq("free")
+      expect(loaded.renews_at).to eq(default_date)
+    end
+
+    it "returns defaults when the store is explicitly set to nil" do
+      klass = Class.new(User) do
+        store_attribute :extra, :plan, :string, default: "free"
+      end
+
+      jamie = klass.new(extra: nil)
+      expect(jamie.plan).to eq("free")
+    end
+
+    it "returns defaults for other keys after writing to a NULL store column" do
+      klass = Class.new(User) do
+        store_attribute :extra, :plan, :string, default: "free"
+        store_attribute :extra, :seats, :integer, default: 5
+      end
+
+      jamie = User.create!
+      RawUser.where(id: jamie.id).update_all(extra: nil)
+
+      loaded = klass.find(jamie.id)
+      loaded.plan = "pro"
+
+      expect(loaded.plan).to eq("pro")
+      expect(loaded.seats).to eq(5)
+
+      loaded.save!
+      expect(klass.find(jamie.id)).to have_attributes(plan: "pro", seats: 5)
+    end
+
+    it "persists a write made while the store column is NULL" do
+      klass = Class.new(User) do
+        store_attribute :extra, :plan, :string, default: "free"
+      end
+
+      jamie = User.create!
+      RawUser.where(id: jamie.id).update_all(extra: nil)
+
+      loaded = klass.find(jamie.id)
+      loaded.plan = "pro"
+      loaded.save!
+
+      expect(klass.find(jamie.id).plan).to eq("pro")
+    end
   end
 
   context "prefix/suffix" do
