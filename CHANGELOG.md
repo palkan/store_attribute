@@ -2,7 +2,7 @@
 
 ## master
 
-- Fix defaults not being applied when reading a store attribute whose column is `NULL` (Active Record 8.1 no longer re-reads the attribute after `prepare` assigns the empty store).
+- Fix store attribute defaults not being returned when the store is `nil` on Active Record 8.1+. Reading from a `nil` store now returns the default without assigning the store or marking the record dirty. ([@HoneyryderChuck](https://github.com/HoneyryderChuck))
 
 ## 2.2.0 (2026-07-17)
 
