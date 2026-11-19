@@ -293,7 +293,8 @@ describe StoreAttribute do
       loaded = klass.find(jamie.id)
       expect(loaded.plan).to eq("free")
       expect(loaded.renews_at).to eq(default_date)
-      expect(loaded.extra).to include("plan" => loaded.plan, "renews_at" => loaded.renews_at)
+      expect(loaded.extra).to be_nil
+      expect(loaded.changed).to be_empty
     end
 
     it "returns defaults when the store is explicitly set to nil" do

@@ -98,12 +98,12 @@ module ActiveRecord
 
       def write(object, attribute, key, value)
         value = type_for(key).cast(value) if typed?(key)
-        prepare_nil_store(object, attribute)
         store_accessor.write(object, attribute, key, value)
       end
 
       def read(object, attribute, key)
-        prepare_nil_store(object, attribute)
+        return default_for(key) if object.public_send(attribute).nil?
+
         store_accessor.read(object, attribute, key)
       end
 
@@ -124,10 +124,12 @@ module ActiveRecord
 
       protected
 
-      # Active Record 8.1 reads from the empty hash it assigns in +prepare+ rather than re-reading the attribute,
-      # which skips the defaults applied when that assignment is cast. Assign first so the read sees them.
-      def prepare_nil_store(object, attribute)
-        prepare(object, attribute) if object.public_send(attribute).nil?
+      def default_for(key)
+        key = key.to_s
+        return unless fallback_to_default?(key)
+
+        value = built_defaults[key].deep_dup
+        typed?(key) ? type_for(key).cast(value) : value
       end
 
       def built_defaults
