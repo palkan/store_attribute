@@ -291,9 +291,9 @@ describe StoreAttribute do
       RawUser.where(id: jamie.id).update_all(extra: nil)
 
       loaded = klass.find(jamie.id)
-      expect(loaded.extra).to be_nil
       expect(loaded.plan).to eq("free")
       expect(loaded.renews_at).to eq(default_date)
+      expect(loaded.extra).to include("plan" => loaded.plan, "renews_at" => loaded.renews_at)
     end
 
     it "returns defaults when the store is explicitly set to nil" do
