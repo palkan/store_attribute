@@ -177,6 +177,22 @@ You can also configure the global default for this option in an initializer or a
 StoreAttribute.store_attribute_unset_values_fallback_to_default = false
 ```
 
+#### `NULL` stores
+
+When the store column itself is `NULL` (e.g., a nullable column without a database default, or `extra: nil` was assigned), accessors with defaults still return the default values, but the store is left untouched:
+
+```ruby
+user = User.find(id) # extra is NULL in the database
+
+user.expired_at #=> 2022-03-19
+user.extra #=> nil
+user.changed? #=> false
+```
+
+This preserves the behaviour of Rails versions prior to 8.1, where reading an accessor implicitly assigned an empty hash (populated with defaults) to a `nil` store. Starting from Rails 8.1, Active Record no longer does that, so reading the store directly returns `nil`, while accessors keep returning defaults.
+
+To keep the store and its accessors consistent, prefer `NOT NULL` store columns (with `{}` as a database default) and use `{}` instead of `nil` to reset a store.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/palkan/store_attribute](https://github.com/palkan/store_attribute).

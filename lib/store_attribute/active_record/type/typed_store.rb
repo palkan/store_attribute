@@ -101,7 +101,13 @@ module ActiveRecord
         store_accessor.write(object, attribute, key, value)
       end
 
-      delegate :get, :read, :prepare, to: :store_accessor
+      def read(object, attribute, key)
+        return default_for(key) if object.public_send(attribute).nil?
+
+        store_accessor.read(object, attribute, key)
+      end
+
+      delegate :get, :prepare, to: :store_accessor
 
       def build_defaults
         defaults.transform_values do |val|
@@ -117,6 +123,14 @@ module ActiveRecord
       end
 
       protected
+
+      def default_for(key)
+        key = key.to_s
+        return unless fallback_to_default?(key)
+
+        value = built_defaults[key].deep_dup
+        typed?(key) ? type_for(key).cast(value) : value
+      end
 
       def built_defaults
         @built_defaults ||= build_defaults
