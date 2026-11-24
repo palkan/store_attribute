@@ -2,6 +2,8 @@
 
 ## master
 
+## 2.3.0 (2026-11-24)
+
 - Preserve store attribute defaults when the store is `nil` on Active Record 8.1+. Accessors with defaults return the default values for a `nil` (`NULL`) store, as on Rails <8.1, but no longer assign the store or mark the record dirty: reading the store directly returns `nil`. ([@HoneyryderChuck](https://github.com/HoneyryderChuck))
 
 ## 2.2.0 (2026-07-17)
